@@ -3,7 +3,7 @@
 NovaVibe is an AI-powered full-stack web application that detects real-time facial expressions and recommends music based on your current mood.
 It combines **computer vision** with a **MERN stack architecture** to create a personalized and interactive music experience.
 
-![alt text](image-1.png)
+![img1](image-1.png)
 ---
 
 ## 🎯 Tagline
@@ -134,7 +134,7 @@ server/
 
 ## 🖼️ Preview
 
-![NovaVibe Preview](![alt text](image.png))
+![img2](image.png)
 
 ---
 
@@ -160,7 +160,7 @@ MIT License
 
 **Nasim Reja Mondal**
 
-* GitHub: https://github.com/NasimReja077
+* GitHub: <https://github.com/NasimReja077>
 * Portfolio: Add your link
 
 ---
