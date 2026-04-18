@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+import { connect } from "mongoose";
 
 function connectToDB() {
-    mongoose.connect(process.env.MONGO_URI)
+    connect(process.env.MONGO_URI)
         .then(() => {
             console.log("Connected to DB")
         })
@@ -10,4 +10,4 @@ function connectToDB() {
         })
 }
 
-module.exports = connectToDB;
+export default connectToDB;
