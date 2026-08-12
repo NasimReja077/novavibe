@@ -15,10 +15,14 @@ function validateRequest(req, res, next){
 
 export const validateRegisterUser = [
      body("email")
-          .isEmail().withMessage("Invalid Email Format"),
+          .trim()
+          .normalizeEmail()
+          .isEmail().withMessage("Invalid email format"),
      body("password")
+          .trim()
           .isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
      body("username")
+          .trim()
           .notEmpty().withMessage("Username is required")
           .isLength({ min: 3 }).withMessage("Username must be at least 3 characters long"),
      validateRequest
@@ -26,8 +30,11 @@ export const validateRegisterUser = [
 
 export const validateLoginUser = [
      body("email")
+          .trim()
+          .normalizeEmail()
           .isEmail().withMessage("Invalid email format"),
      body("password")
-          .notEmpty().withMessage("password is required"),
+          .trim()
+          .notEmpty().withMessage("Password is required"),
      validateRequest
 ]
