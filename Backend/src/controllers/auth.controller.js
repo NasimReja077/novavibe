@@ -2,7 +2,7 @@ import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 import redis from "../config/cache.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/token.utils.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/token.utils.js";
 
 async function sendTokenResponse(user, res, message) {
      const accessToken = generateAccessToken(user);
@@ -178,4 +178,59 @@ export const logout = async (req, res) => {
      }
 
      res.status(200).json({ message: "Logout successful." });
+}
+
+export const refresh = async (req, res) => {
+     const refreshToken = req.cookies?.refreshToken || (
+          req.headers.authorization?.startsWith("Bearer ")
+               ? req.headers.authorization.split(" ")[1]
+               : undefined
+     );
+
+     if (!refreshToken) {
+          return res.status(401).json({ message: "Refresh token not provided" });
+     }
+
+     try {
+          const isBlacklisted = await redis.get(`blacklist:${refreshToken}`);
+          if (isBlacklisted) {
+               return res.status(401).json({ message: "Invalid or revoked refresh token" });
+          }
+
+          const decoded = verifyRefreshToken(refreshToken);
+          const user = await userModel.findById(decoded.id);
+
+          if (!user) {
+               return res.status(401).json({ message: "Invalid refresh token" });
+          }
+
+          // Rotate tokens: issue new access and refresh tokens
+          const newAccessToken = generateAccessToken(user);
+          const newRefreshToken = generateRefreshToken(user);
+
+          // Set cookies
+          res.cookie("accessToken", newAccessToken, {
+               httpOnly: true,
+               secure: config.NODE_ENV === "production",
+               sameSite: "lax",
+               maxAge: 15 * 60 * 1000 // 15 minutes
+          });
+
+          res.cookie("refreshToken", newRefreshToken, {
+               httpOnly: true,
+               secure: config.NODE_ENV === "production",
+               sameSite: "lax",
+               maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+          });
+
+          // Blacklist old refresh token until its expiry
+          const expiresInSeconds = Math.max(decoded.exp - Math.floor(Date.now() / 1000), 0);
+          if (expiresInSeconds > 0) {
+               await redis.set(`blacklist:${refreshToken}`, "true", "EX", expiresInSeconds);
+          }
+
+          return res.status(200).json({ message: "Token refreshed", success: true });
+     } catch (err) {
+          return res.status(401).json({ message: "Invalid refresh token" });
+     }
 }
