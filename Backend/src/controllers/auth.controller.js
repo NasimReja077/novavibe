@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
+import redis from "../config/cache.js";
 
 async function sendTokenResponse(user, res, message) {
      const token = jwt.sign({
@@ -9,19 +10,23 @@ async function sendTokenResponse(user, res, message) {
           expiresIn: "7d"
      })
 
-     res.cookie("token", token)
+     res.cookie("token", token, {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000
+     })
 
      res.status(200).json({
           message,
           success: true,
           user: {
                id: user._id,
-               email: user.email,,
+               email: user.email,
                username: user.username
           }
      })
 }
-
 
 export const register = async (req, res) => {
      const { email, password, username } = req.body;
@@ -74,35 +79,35 @@ export const login = async (req, res) => {
      await sendTokenResponse(user, res, "User logged in successfully");
 }
 
-// export const googleCallback = async (req, res) => {
-//      // console.log(req.user)
+export const googleCallback = async (req, res) => {
+     // console.log(req.user)
 
-//      const { id, displayName, emails, photos } = req.user
-//      const email = emails[0].value;
-//      const profilePic = photos[0].value;
+     const { id, displayName, emails, photos } = req.user
+     const email = emails[0].value;
+     const profilePic = photos[0].value;
 
-//      let user = await userModel.findOne({
-//           email
-//      })
+     let user = await userModel.findOne({
+          email
+     })
 
-//      if (!user){
-//           user = await userModel.create({
-//                email,
-//                googleID: id,
-//                fullname: displayName,
-//           })
-//      }
+     if (!user){
+          user = await userModel.create({
+               email,
+               googleID: id,
+               fullname: displayName,
+          })
+     }
 
-//      const token = jwt.sign({
-//           id: user._id,
-//      }, config.JWT_SECRET, {
-//           expiresIn: "7d"
-//      })
+     const token = jwt.sign({
+          id: user._id,
+     }, config.JWT_SECRET, {
+          expiresIn: "7d"
+     })
 
-//      res.cookie("token", token)
+     res.cookie("token", token)
      
-//      res.redirect("http://localhost:5173/")
-// }
+     res.redirect("http://localhost:5173/")
+}
 
 export const getMe = async (req, res) => {
      const user = req.user;
@@ -116,4 +121,36 @@ export const getMe = async (req, res) => {
                username: user.username
           }
      })
+}
+
+
+export const logout = async (req, res) => {
+    const token = req.cookies?.token;
+
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: config.NODE_ENV === "production",
+        sameSite: "lax"
+    });
+
+    if (!token) {
+        return res.status(200).json({
+            message: "Logout successful."
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+        const expiresInSeconds = Math.max(decoded.exp - Math.floor(Date.now() / 1000), 0);
+
+        if (expiresInSeconds > 0) {
+            await redis.set(`blacklist:${token}`, "true", "EX", expiresInSeconds);
+        }
+    } catch (error) {
+        // Token already invalid or expired, but cookie is cleared.
+    }
+
+    res.status(200).json({
+        message: "Logout successful."
+    });
 }
