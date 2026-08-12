@@ -1,10 +1,16 @@
 import Redis from "ioredis"
+import { config } from "./config.js"
 
-const redis = new Redis({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    password: process.env.REDIS_PASSWORD
-})
+const redisOptions = {
+    host: config.REDIS_HOST,
+    port: config.REDIS_PORT,
+};
+
+if (config.REDIS_PASSWORD) {
+    redisOptions.password = config.REDIS_PASSWORD;
+}
+
+const redis = new Redis(redisOptions);
 
 redis.on("connect", () => {
     console.log("server is connected to redis")
