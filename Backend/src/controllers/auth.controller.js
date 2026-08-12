@@ -2,19 +2,24 @@ import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 import redis from "../config/cache.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/token.utils.js";
 
 async function sendTokenResponse(user, res, message) {
-     const token = jwt.sign({
-          id: user._id,
-     }, config.JWT_SECRET, {
-          expiresIn: "7d"
-     })
+     const accessToken = generateAccessToken(user);
+     const refreshToken = generateRefreshToken(user);
 
-     res.cookie("token", token, {
+     res.cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: config.NODE_ENV === "production",
           sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000
+          maxAge: 15 * 60 * 1000 // 15 minutes
+     })
+
+     res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
      })
 
      res.status(200).json({
@@ -97,15 +102,23 @@ export const googleCallback = async (req, res) => {
                fullname: displayName,
           })
      }
+     const accessToken = generateAccessToken(user);
+     const refreshToken = generateRefreshToken(user);
 
-     const token = jwt.sign({
-          id: user._id,
-     }, config.JWT_SECRET, {
-          expiresIn: "7d"
+     res.cookie("accessToken", accessToken, {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000
      })
 
-     res.cookie("token", token)
-     
+     res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000
+     })
+
      res.redirect("http://localhost:5173/")
 }
 
@@ -125,32 +138,44 @@ export const getMe = async (req, res) => {
 
 
 export const logout = async (req, res) => {
-    const token = req.cookies?.token;
+     const accessToken = req.cookies?.accessToken;
+     const refreshToken = req.cookies?.refreshToken;
 
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: config.NODE_ENV === "production",
-        sameSite: "lax"
-    });
+     res.clearCookie("accessToken", {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax"
+     });
 
-    if (!token) {
-        return res.status(200).json({
-            message: "Logout successful."
-        });
-    }
+     res.clearCookie("refreshToken", {
+          httpOnly: true,
+          secure: config.NODE_ENV === "production",
+          sameSite: "lax"
+     });
 
-    try {
-        const decoded = jwt.verify(token, config.JWT_SECRET);
-        const expiresInSeconds = Math.max(decoded.exp - Math.floor(Date.now() / 1000), 0);
+     if (!accessToken && !refreshToken) {
+          return res.status(200).json({ message: "Logout successful." });
+     }
 
-        if (expiresInSeconds > 0) {
-            await redis.set(`blacklist:${token}`, "true", "EX", expiresInSeconds);
-        }
-    } catch (error) {
-        // Token already invalid or expired, but cookie is cleared.
-    }
+     try {
+          if (accessToken) {
+               const decoded = jwt.verify(accessToken, config.JWT_SECRET);
+               const expiresInSeconds = Math.max(decoded.exp - Math.floor(Date.now() / 1000), 0);
+               if (expiresInSeconds > 0) {
+                    await redis.set(`blacklist:${accessToken}`, "true", "EX", expiresInSeconds);
+               }
+          }
 
-    res.status(200).json({
-        message: "Logout successful."
-    });
+          if (refreshToken) {
+               const decodedRefresh = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
+               const expiresInSeconds = Math.max(decodedRefresh.exp - Math.floor(Date.now() / 1000), 0);
+               if (expiresInSeconds > 0) {
+                    await redis.set(`blacklist:${refreshToken}`, "true", "EX", expiresInSeconds);
+               }
+          }
+     } catch (error) {
+          // Tokens may already be invalid/expired; cookies are cleared regardless.
+     }
+
+     res.status(200).json({ message: "Logout successful." });
 }
