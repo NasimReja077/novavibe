@@ -1,5 +1,29 @@
 import mongoose from "mongoose";
 
+const allowedGenres = [
+  "Pop",
+  "Lo-Fi",
+  "Rock",
+  "Hip-Hop",
+  "chillout",
+  "Neo-Soul",
+  "Classical",
+  "Folk",
+  "Indie",
+  "Electronic",
+  "Punk",
+  "K-pop",
+  "Heavy-Metal",
+  "J-pop",
+  "Bollywood",
+  "Country",
+  "Blues",
+  "Metal",
+  "Soundtrack",
+  "Disco",
+  "Soft",
+];
+
 const songSchema = new mongoose.Schema(
   {
     title: {
@@ -46,32 +70,17 @@ const songSchema = new mongoose.Schema(
       default: "pending",
     },
     genre: {
-      type: String,
-      required: [true, "Genre is required"],
-      trim: true,
-      enum: [
-        "Pop",
-        "Lo-Fi",
-        "Rock",
-        "Hip-Hop",
-        "chillout",
-        "Neo-Soul",
-        "Classical",
-        "Folk",
-        "Indie",
-        "Electronic",
-        "Punk",
-        "K-pop",
-        "Heavy-Metal",
-        "J-pop",
-        "Bollywood",
-        "Country",
-        "Blues",
-        "Metal",
-        "Soundtrack",
-        "Disco",
-        "Soft",
+      type: [
+        {
+          type: String,
+          enum: allowedGenres,
+        },
       ],
+      required: [true, "At least one genre is required"],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "At least one genre is required",
+      },
     },
     songLanguage: {
       type: String,

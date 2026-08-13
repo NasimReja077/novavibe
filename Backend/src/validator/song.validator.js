@@ -22,7 +22,7 @@ const allowedGenres = [
   "Metal",
   "Soundtrack",
   "Disco",
-  "Soft"
+  "Soft",
 ];
 
 export const validate = (req, res, next) => {
@@ -53,12 +53,29 @@ export const createSongValidator = [
     .isLength({ min: 2, max: 100 })
     .withMessage("Artist name must be between 2 and 100 characters"),
 
-  body("genre")
-    .trim()
-    .notEmpty()
-    .withMessage("Genre is required")
-    .isIn(allowedGenres)
-    .withMessage(`Genre must be one of: ${allowedGenres.join(", ")}`),
+  body("genre").custom((value) => {
+    const genres = Array.isArray(value)
+      ? value
+      : typeof value === "string"
+        ? value.split(",")
+        : [];
+
+    const cleanedGenres = genres
+      .map((genre) => String(genre).trim())
+      .filter(Boolean);
+
+    if (!cleanedGenres.length) {
+      throw new Error("At least one genre is required");
+    }
+
+    for (const genre of cleanedGenres) {
+      if (!allowedGenres.includes(genre)) {
+        throw new Error(`Genre must be one of: ${allowedGenres.join(", ")}`);
+      }
+    }
+
+    return true;
+  }),
 
   body("mood")
     .optional({ nullable: true })
@@ -80,7 +97,13 @@ export const createSongValidator = [
     .withMessage("Language must be between 2 and 50 characters"),
 
   (req, res, next) => {
-    if (!req.files || !req.files.poster || !req.files.poster.length || !req.files.song || !req.files.song.length) {
+    if (
+      !req.files ||
+      !req.files.poster ||
+      !req.files.poster.length ||
+      !req.files.song ||
+      !req.files.song.length
+    ) {
       return res.status(400).json({
         success: false,
         message: "Both poster image and song file are required",
