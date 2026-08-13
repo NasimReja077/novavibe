@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const songSchema = new mongoose.Schema(
   {
@@ -12,85 +12,90 @@ const songSchema = new mongoose.Schema(
       type: String,
       required: [true, "Artist name is required"],
       trim: true,
-      maxlength: 100,
+      maxlength: [100, "Artist name cannot exceed 100 characters"],
     },
-
     songUrl: {
       type: String,
-      required: [true, "Song url is required"],
+      required: [true, "Song URL is required"],
+      trim: true,
     },
     songFileId: {
-      type: String, // ImageKit fileId (useful for deletion)
+      type: String,
     },
-    // Poster / Cover
     posterUrl: {
       type: String,
       required: [true, "Poster URL is required"],
+      trim: true,
     },
     posterFileId: {
       type: String,
     },
-
     mood: {
       type: String,
-      required: true,
+      lowercase: true,
+      trim: true,
+      default: "neutral",
       enum: {
         values: ["happy", "sad", "surprised", "neutral", "angry"],
         message: "{VALUE} is not a supported mood",
       },
-      index: true, // Important for fast filtering
     },
-
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-
     genre: {
       type: String,
+      required: [true, "Genre is required"],
+      trim: true,
       enum: [
         "Pop",
+        "Lo-Fi",
         "Rock",
         "Hip-Hop",
+        "chillout",
+        "Neo-Soul",
         "Classical",
-        "Jazz",
+        "Folk",
+        "Indie",
         "Electronic",
-        "R&B",
+        "Punk",
+        "K-pop",
+        "Heavy-Metal",
+        "J-pop",
+        "Bollywood",
         "Country",
         "Blues",
         "Metal",
+        "Soundtrack",
+        "Disco",
+        "Soft",
       ],
-      required: true,
     },
-
-    language: {
+    songLanguage: {
       type: String,
       default: "english",
       lowercase: true,
-      // enum : {
-      //     values : ["english","Hindie","bengole"],
-      //     message : ['language can be only english,hindie or bengole']
-      // }
+      trim: true,
     },
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
-      required: [true, "uploader userId is required"],
+      ref: "user",
+      required: [true, "Uploader user ID is required"],
     },
     isActive: {
       type: Boolean,
-      default: true, // Soft delete support
+      default: true,
+      index: true,
     },
   },
   { timestamps: true },
 );
 
-// Indexes for performance
-songSchema.index({ mood: 1 }); // Most popular songs per mood
-songSchema.index({ title: "text", songArtist: "text", genre: "text" }); // Text search
+songSchema.index({ title: "text", songArtist: "text", genre: "text" });
 songSchema.index({ isActive: 1, mood: 1 });
 
-const songModel = mongoose.model("songs", songSchema);
+const Song = mongoose.model("songs", songSchema);
 
-module.exports = songModel;
+export default Song;
