@@ -1,5 +1,6 @@
 import ImageKit, { toFile } from "@imagekit/nodejs";
-import imagekit from "../config/imagekit";
+import NodeID3 from "node-id3";
+import imagekit from "../config/imagekit.js";
 
 /**
  * Upload a single file (image or audio) to ImageKit
@@ -34,6 +35,36 @@ export const uploadToImageKit = async (
   } catch (error) {
     console.error("ImageKit Upload Error:", error);
     throw new Error(error.message || "Failed to upload file to ImageKit");
+  }
+};
+
+/**
+ * Read metadata from uploaded MP3 using node-id3
+ */
+export const readSongMetadata = (songFile) => {
+  try {
+    if (!songFile?.buffer) {
+      return {};
+    }
+
+    const tags = NodeID3.read(songFile.buffer);
+
+    return {
+      title: tags.title?.trim() || songFile.originalname.replace(/\.[^/.]+$/, "") || "Untitled Song",
+      songArtist: tags.artist?.trim() || "Unknown Artist",
+      genre: tags.genre?.trim() || "Pop",
+      album: tags.album?.trim() || "",
+      artwork: tags.image || null,
+    };
+  } catch (error) {
+    console.warn("NodeID3 metadata read failed:", error.message);
+    return {
+      title: songFile?.originalname?.replace(/\.[^/.]+$/, "") || "Untitled Song",
+      songArtist: "Unknown Artist",
+      genre: "Pop",
+      album: "",
+      artwork: null,
+    };
   }
 };
 
@@ -73,5 +104,3 @@ export const deleteFromImageKit = async (fileId) => {
     return false;
   }
 };
-
-export default { uploadFile };
