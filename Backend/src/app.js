@@ -4,7 +4,10 @@ import cors from "cors";
 import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes.js";
-// import songRoutes from "./routes/song.routes.js";
+import songRoutes from "./routes/song.routes.js";
+import bookmarkRoutes from "./routes/bookmark.routes.js";
+import recentlyPlayedSongRoutes from "./routes/recentlyPlayedSong.routes.js";
+import playlistRoutes from "./routes/playlist.routes.js";
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -44,6 +47,9 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes)
-// app.use("/api/songs", songRoutes)
+app.use("/api/songs", songRoutes)
+app.use("/api/bookmarks", bookmarkRoutes)
+app.use("/api/recently-played", recentlyPlayedSongRoutes)
+app.use("/api/playlists", playlistRoutes)
 
 export default app;
