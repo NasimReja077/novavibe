@@ -1,25 +1,26 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-// Each document = one play event for a user
-// We keep last 20 songs per user — older ones delete ho jaate hain
 const recentlyPlayedSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      required: true,
+      required: [true, "User ID is required"],
+      index: true,
     },
     songId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "songs",
-      required: true,
+      required: [true, "Song ID is required"],
+      index: true,
     },
   },
-  { timestamps: true } // createdAt = when it was played
+  { timestamps: true },
 );
 
-const recentlyPlayedModel = mongoose.model("recentlyplayed", recentlyPlayedSchema);
+recentlyPlayedSchema.index({ userId: 1, createdAt: -1 });
 
-module.exports = recentlyPlayedModel;
+const RecentlyPlayedSong = mongoose.model("recentlyplayed", recentlyPlayedSchema);
 
+export default RecentlyPlayedSong;
 
