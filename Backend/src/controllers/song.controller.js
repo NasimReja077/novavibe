@@ -1,39 +1,127 @@
+import Song from "../models/song.model.js";
+import { uploadSongFiles, readSongMetadata } from "../services/storage.service.js";
 
-import songModel from '../models/song.model.js'
-import { uploadSongFiles } from '../services/storage.service.js'
+export const createSong = async (req, res) => {
+  try {
+    if (!req.files?.poster?.[0] || !req.files?.song?.[0]) {
+      return res.status(400).json({
+        success: false,
+        message: "Both poster image and song file are required",
+      });
+    }
 
-export const createSong = async (req, res) =>{
-     try {
-          const { title, mood } = req.body;
-          const posterFile = req.files.poster[0];
-          const songFile = req.files.song[0];
+    const { title, songArtist, mood, genre, songLanguage, language } = req.body;
+    const posterFile = req.files.poster[0];
+    const songFile = req.files.song[0];
+    const songMeta = readSongMetadata(songFile);
 
-          const { posterUrl, songUrl, posterFileId, songFileId } = await uploadSongFiles(
-               posterFile,
-               songFile
-          )
+    const finalTitle = title?.trim() || songMeta.title;
+    const finalArtist = songArtist?.trim() || songMeta.songArtist;
+    const finalGenre = genre?.trim() || songMeta.genre;
+    const finalSongLanguage = songLanguage || language || "english";
 
-          const newSong = await songModel.createSong({
-               title,
-      mood: mood || 'Neutral',
+    const { posterUrl, songUrl, posterFileId, songFileId } = await uploadSongFiles(
+      posterFile,
+      songFile,
+    );
+
+    const newSong = await Song.create({
+      title: finalTitle,
+      songArtist: finalArtist,
+      mood: mood || "neutral",
+      genre: finalGenre,
+      songLanguage: finalSongLanguage,
       posterUrl,
-      url: songUrl, // your schema uses "url" for the audio
-      // Optional: store fileIds if you want to delete later
-      // posterFileId,
-      // songFileId,
-          })
+      posterFileId,
+      songUrl,
+      songFileId,
+      uploadedBy: req.user?._id,
+    });
 
-          res.status(201).json({
-               success: true,
-               message: 'Song uplode Succesfully',
-               data: newSong,
-          });
+    return res.status(201).json({
+      success: true,
+      message: "Song uploaded successfully",
+      data: newSong,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong while uploading song",
+    });
+  }
+};
 
-     } catch (error) {
-          console.error(error)
-          res.status(500).json({
-               success: false,
-               message: error.message || 'Something went wrong while uploading song',
-          })
-     }
-} 
+export const getAllSongs = async (req, res) => {
+  try {
+    const songs = await Song.find({ isActive: true })
+      .populate("uploadedBy", "username email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: songs.length,
+      data: songs,
+    });
+  } catch (error) {
+    console.error("Error in getAllSongs:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+export const getSongById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const song = await Song.findById(id).populate("uploadedBy", "username email");
+
+    if (!song) {
+      return res.status(404).json({
+        success: false,
+        message: "Song not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: song,
+    });
+  } catch (error) {
+    console.error("Error in getSongById:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+export const getAllSongsByUser = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const songs = await Song.find({ uploadedBy: userId, isActive: true })
+      .populate("uploadedBy", "username email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: songs.length,
+      data: songs,
+    });
+  } catch (error) {
+    console.error("Error in getAllSongsByUser:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
