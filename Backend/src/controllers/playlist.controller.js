@@ -3,13 +3,31 @@ import { uploadToImageKit } from "../services/storage.service.js";
 
 export const createPlaylistSongs = async (req, res) => {
   try {
-    const { title, songs = [] } = req.body;
+    const { title } = req.body;
+    let { songs = [] } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({
         success: false,
         message: "Playlist title is required",
       });
+    }
+
+    // Handle songs coming as string from form-data
+    if (typeof songs === "string") {
+      try {
+        songs = JSON.parse(songs);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid songs format. Send a valid JSON array of song IDs.",
+        });
+      }
+    }
+
+    // Ensure songs is always an array
+    if (!Array.isArray(songs)) {
+      songs = [];
     }
 
     let thumbnailUrl = "";
@@ -93,4 +111,3 @@ export const getPlaylistSongById = async (req, res) => {
     });
   }
 };
-
