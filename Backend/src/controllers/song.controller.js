@@ -1,6 +1,23 @@
 import Song from "../models/song.model.js";
 import { uploadSongFiles, readSongMetadata } from "../services/storage.service.js";
 
+const normalizeGenres = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
 export const createSong = async (req, res) => {
   try {
     if (!req.files?.poster?.[0] || !req.files?.song?.[0]) {
@@ -17,7 +34,8 @@ export const createSong = async (req, res) => {
 
     const finalTitle = title?.trim() || songMeta.title;
     const finalArtist = songArtist?.trim() || songMeta.songArtist;
-    const finalGenre = genre?.trim() || songMeta.genre;
+    const normalizedGenres = normalizeGenres(genre);
+    const finalGenre = normalizedGenres.length ? normalizedGenres : [songMeta.genre].filter(Boolean);
     const finalSongLanguage = songLanguage || language || "english";
 
     const { posterUrl, songUrl, posterFileId, songFileId } = await uploadSongFiles(
