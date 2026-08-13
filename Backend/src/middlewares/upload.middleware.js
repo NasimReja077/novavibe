@@ -12,11 +12,11 @@ const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase().replace('.','');
   const mimetype = file.mimetype;
 
-  if (file.fieldname === 'poster') {
+  if (file.fieldname === 'poster' || file.fieldname === 'thumbnail' || file.fieldname === 'playlistThumbnail') {
     if (allowedImageTypes.test(ext) && mimetype.startsWith('image/')) {
       return cb(null, true);
     }
-    return cb(new Error('Only image files are allowed for poster (jpg, png, webp, gif)'), false);
+    return cb(new Error('Only image files are allowed for poster or thumbnail (jpg, png, webp, gif)'), false);
   }
 
   if (file.fieldname === 'song' || file.fieldname === 'audio'){
@@ -41,6 +41,8 @@ export const uploadSongFiles = upload.fields([
   { name: 'poster', maxCount: 1 },
   { name: 'song', maxCount: 1 }, // or 'audio'
 ]);
+
+export const uploadPlaylistThumbnail = upload.single('thumbnail');
 
 // Single file uploaders (if needed elsewhere)
 export const uploadPoster = upload.single('poster');
