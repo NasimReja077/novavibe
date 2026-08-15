@@ -9,8 +9,12 @@ const userSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        required: [ true, "Username is required" ],
-        unique: [ true, "Username must be unique" ]
+        // required: [ true, "Username is required" ],
+        required: function () {
+          return !this.googleID;
+     },
+        unique: [ true, "Username must be unique" ],
+        sparse: true, 
     },
     password: {
         type: String,

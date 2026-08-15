@@ -85,21 +85,31 @@ export const login = async (req, res) => {
 }
 
 export const googleCallback = async (req, res) => {
-     // console.log(req.user)
-
+     try {
+          // console.log(req.user)
      const { id, displayName, emails, photos } = req.user
      const email = emails[0].value;
-     const profilePic = photos[0].value;
+     // const profilePic = photos?[0]?.value;
 
      let user = await userModel.findOne({
           email
      })
 
      if (!user){
+
+          const baseUsername = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+          let username = baseUsername;
+          let suffix = 0;
+          while (await userModel.findOne({ username })) {
+               suffix += 1;
+               username = `${baseUsername}${suffix}`;
+          }
+
           user = await userModel.create({
                email,
                googleID: id,
                fullname: displayName,
+               username,
           })
      }
      const accessToken = generateAccessToken(user);
@@ -120,6 +130,10 @@ export const googleCallback = async (req, res) => {
      })
 
      res.redirect("http://localhost:5173/")
+     } catch (error) {
+          console.error("Google auth error:", error);
+          res.redirect(config.NODE_ENV === "development" ? "http://localhost:5173/login" : "/login");
+     }
 }
 
 export const getMe = async (req, res) => {
