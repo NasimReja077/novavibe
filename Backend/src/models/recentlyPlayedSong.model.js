@@ -4,7 +4,7 @@ const recentlyPlayedSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user",
       required: [true, "User ID is required"],
       index: true,
     },
@@ -23,4 +23,3 @@ recentlyPlayedSchema.index({ userId: 1, createdAt: -1 });
 const RecentlyPlayedSong = mongoose.model("recentlyplayed", recentlyPlayedSchema);
 
 export default RecentlyPlayedSong;
-
