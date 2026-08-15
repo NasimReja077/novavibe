@@ -2,19 +2,18 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "../service/authApi.js";
 
 export const registerUser = createAsyncThunk(
-     "auth/register",
-     async (userData, { rejectWithValue }) => {
-          try {
-               const { data } = await authApi.register(userData);
-               return data.user;
-          } catch (error) {
-               return registerUser(
-                    error.response?.data?.message || "Registration failed"
-               );
-          }
-     }
+  "auth/register",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const { data } = await authApi.register(userData);
+      return data.user;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
+    }
+  }
 );
-
 
 export const loginUser = createAsyncThunk(
   "auth/login",
@@ -75,11 +74,11 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
     },
-    
      // setIsAuthenticated: (state, action) => {},
      // setLoading: (state, action) => {},
      // setError: (state, action) => {},
-extraReducers: (builder) => {
+  },
+  extraReducers: (builder) => {
     // Register
     builder
       .addCase(registerUser.pending, (state) => {
