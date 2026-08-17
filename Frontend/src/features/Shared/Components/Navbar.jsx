@@ -1,17 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
 import { toast } from "react-hot-toast";
-import { LuSearch, LuUser, LuLogOut, LuMenu, LuX } from "react-icons/lu";
+import {
+  LuSearch,
+  LuUser,
+  LuLogOut,
+  LuMenu,
+  LuX,
+  LuSparkles,
+  LuMusic,
+  LuHeart,
+  LuClock,
+  LuLayoutDashboard,
+  // LuPlusCircle
+} from "react-icons/lu";
+import { AiTwotonePlusCircle } from "react-icons/ai";
 import { useAuth } from "../../auth/hook/useAuth.js";
 
-const navLinks = [{ label: "Home", to: "/" }];
+const navLinks = [
+  { label: "Home", to: "/", icon: LuMusic },
+  { label: "Playlists", to: "/playlists", icon: LuSparkles },
+  { label: "Bookmarks", to: "/bookmarks", icon: LuHeart },
+  { label: "Recent", to: "/recently-played", icon: LuClock },
+  { label: "Dashboard", to: "/dashboard", icon: LuLayoutDashboard },
+];
 
-const Navbar = () => {
+const Navbar = ({ onSearchChange, searchTerm = "" }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState(searchTerm);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -30,166 +50,277 @@ const Navbar = () => {
     const resultAction = await logout();
 
     if (resultAction?.meta?.requestStatus === "fulfilled") {
-      toast.success("Logged out", { id: "logout-success" });
+      toast.success("Logged out successfully", { id: "logout-success" });
     }
     navigate("/login");
   };
 
-  const initial = (user?.username || user?.email || "?").charAt(0).toUpperCase();
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (onSearchChange) {
+      onSearchChange(localSearch);
+    }
+  };
+
+  const initial = (user?.username || user?.email || "U").charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-[#05080f]/90 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="font-['Bebas_Neue'] text-2xl tracking-[0.06em] text-[#dde8ff]">
-            NovaVibe
-          </span>
-          <span className="rounded-md border border-[rgba(61,139,255,0.25)] bg-[rgba(61,139,255,0.10)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#3d8bff]">
-            AI
-          </span>
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0f0f12]/90 backdrop-blur-xl transition-all duration-300">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
+        
+        {/* Brand Logo with Text Design */}
+        <Link to="/" className="flex items-center gap-2 shrink-0 group">
+          <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[#d62b70]/20 to-[#2bd6d6]/20 border border-[#d62b70]/30 group-hover:border-[#d62b70] transition-colors">
+            <span className="font-['Bebas_Neue'] text-xl tracking-wider text-[#ffb1c4] group-hover:text-white transition-colors">
+              NV
+            </span>
+            <div className="absolute -bottom-0.5 w-4 h-0.5 bg-[#d62b70] rounded-full shadow-[0_0_8px_#d62b70]" />
+          </div>
+          
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-['Montserrat'] font-black text-xl md:text-2xl tracking-tight bg-gradient-to-r from-white via-[#e4e1e6] to-[#ffb1c4] bg-clip-text text-transparent group-hover:from-white group-hover:to-[#2bd6d6] transition-all">
+              NovaVibe
+            </span>
+            <span className="rounded-full bg-[#d62b70]/15 border border-[#d62b70]/30 px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-widest text-[#ffb1c4]">
+              AI
+            </span>
+          </div>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                  isActive
-                    ? "text-[#dde8ff]"
-                    : "text-[#5a7ab0] hover:text-[#dde8ff]"
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
+        {/* Desktop Navigation Links */}
+        <div className="hidden lg:flex items-center gap-1">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+                    isActive
+                      ? "text-white bg-[#1f1f22] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/10 text-[#ffb1c4]"
+                      : "text-[#94a3b8] hover:text-white hover:bg-[#1a1a1e]"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon size={15} className={isActive ? "text-[#d62b70]" : "text-[#94a3b8]"} />
+                    <span>{link.label}</span>
+                    {isActive && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#d62b70] rounded-full shadow-[0_0_8px_#d62b70]" />
+                    )}
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </div>
 
-        {/* Search (desktop) */}
-        <div className="hidden md:flex flex-1 max-w-xs items-center gap-2 rounded-xl border border-[rgba(61,139,255,0.16)] bg-[rgba(4,8,20,0.92)] px-3 py-2 focus-within:border-[#3d8bff] transition-colors duration-200">
-          <LuSearch size={15} className="text-[#5a7ab0] shrink-0" />
-          <input
-            type="text"
-            placeholder="Search songs, artists..."
-            className="w-full bg-transparent text-[13px] text-[#dde8ff] placeholder:text-[#1e3356] outline-none"
-          />
+        {/* Search Bar (Desktop) */}
+        <div className="hidden md:flex flex-1 max-w-xs xl:max-w-sm items-center">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="w-full flex items-center gap-2.5 rounded-full border border-white/10 bg-[#16161a]/90 px-3.5 py-1.5 focus-within:border-[#d62b70]/60 focus-within:ring-1 focus-within:ring-[#d62b70]/30 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+          >
+            <LuSearch size={15} className="text-[#94a3b8] shrink-0" />
+            <input
+              type="text"
+              value={localSearch}
+              onChange={(e) => {
+                setLocalSearch(e.target.value);
+                if (onSearchChange) onSearchChange(e.target.value);
+              }}
+              placeholder="Search songs, artists, vibes..."
+              className="w-full bg-transparent text-[13px] text-white placeholder:text-[#94a3b8]/60 outline-none"
+            />
+          </form>
         </div>
 
-        {/* Right side */}
+        {/* Right Side Actions */}
         <div className="flex items-center gap-3">
+          {isAuthenticated && (
+            <Link
+              to="/upload-song"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#d62b70]/15 hover:bg-[#d62b70]/25 border border-[#d62b70]/40 text-[#ffb1c4] hover:text-white text-xs font-semibold tracking-wide transition-all duration-200 hover:scale-105"
+            >
+              <AiTwotonePlusCircle size={14} />
+              <span>Upload Song</span>
+            </Link>
+          )}
+
           {isAuthenticated ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setMenuOpen((prev) => !prev)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#3d8bff] text-sm font-semibold text-white shadow-[0_4px_14px_rgba(61,139,255,0.35)] transition-transform duration-200 hover:-translate-y-0.5"
+                className="flex items-center gap-2.5 p-1 rounded-full bg-[#1b1b1e] border border-white/10 hover:border-[#d62b70]/50 transition-all hover:scale-105"
                 aria-label="Account menu"
               >
-                {initial}
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#d62b70] to-[#8b5cf6] flex items-center justify-center text-xs font-bold text-white shadow-[0_2px_10px_rgba(214,43,112,0.4)]">
+                  {initial}
+                </div>
+                <span className="hidden md:block text-xs font-medium text-[#e4e1e6] pr-2">
+                  {user?.username || "Account"}
+                </span>
               </button>
 
               {menuOpen && (
-                <ul className="absolute right-0 mt-3 w-52 overflow-hidden rounded-xl border border-[rgba(61,139,255,0.16)] bg-[rgba(8,13,26,0.98)] p-1.5 shadow-[0_18px_40px_rgba(0,0,0,0.55)] backdrop-blur-md">
-                  <li className="px-3 py-2 text-[12px] text-[#5a7ab0]">
-                    Signed in as{" "}
-                    <span className="text-[#dde8ff] font-medium">
+                <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#16161a]/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div className="px-3 py-2.5 border-b border-white/5">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                      Signed in as
+                    </p>
+                    <p className="truncate text-xs font-bold text-white mt-0.5">
                       {user?.username || user?.email}
-                    </span>
-                  </li>
-                  <li>
+                    </p>
+                  </div>
+
+                  <div className="py-1 flex flex-col gap-0.5">
+                    <Link
+                      to="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#e4e1e6] hover:bg-white/5 hover:text-[#ffb1c4] transition-colors"
+                    >
+                      <LuUser size={14} />
+                      User Profile
+                    </Link>
                     <Link
                       to="/dashboard"
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#dde8ff] transition-colors duration-150 hover:bg-[rgba(61,139,255,0.10)]"
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#e4e1e6] hover:bg-white/5 hover:text-[#ffb1c4] transition-colors"
                     >
-                      <LuUser size={15} />
+                      <LuLayoutDashboard size={14} />
                       Dashboard
                     </Link>
-                  </li>
-                  <li>
+                    <Link
+                      to="/playlists"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#e4e1e6] hover:bg-white/5 hover:text-[#ffb1c4] transition-colors"
+                    >
+                      <LuSparkles size={14} />
+                      My Playlists
+                    </Link>
+                    <Link
+                      to="/bookmarks"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#e4e1e6] hover:bg-white/5 hover:text-[#ffb1c4] transition-colors"
+                    >
+                      <LuHeart size={14} />
+                      Bookmarks
+                    </Link>
+                    <Link
+                      to="/recently-played"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#e4e1e6] hover:bg-white/5 hover:text-[#ffb1c4] transition-colors"
+                    >
+                      <LuClock size={14} />
+                      Recently Played
+                    </Link>
+                  </div>
+
+                  <div className="border-t border-white/5 pt-1">
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-300 transition-colors duration-150 hover:bg-red-500/10"
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
                     >
-                      <LuLogOut size={15} />
+                      <LuLogOut size={14} />
                       Logout
                     </button>
-                  </li>
-                </ul>
+                  </div>
+                </div>
               )}
             </div>
           ) : (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-[#5a7ab0] transition-colors duration-200 hover:text-[#dde8ff]"
+                className="rounded-full px-4 py-1.5 text-xs font-semibold text-[#e4e1e6] hover:text-white hover:bg-white/5 transition-all duration-200"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="rounded-lg bg-[#3d8bff] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(61,139,255,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#5aa3ff]"
+                className="rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] px-4 py-1.5 text-xs font-semibold text-white shadow-[0_2px_15px_rgba(214,43,112,0.4)] hover:brightness-110 transition-all duration-200 hover:scale-105"
               >
                 Sign Up
               </Link>
             </div>
           )}
 
-          {/* Mobile menu toggle */}
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileOpen((prev) => !prev)}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[#5a7ab0] transition-colors duration-200 hover:text-[#dde8ff] md:hidden"
-            aria-label="Toggle menu"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#16161a] text-[#94a3b8] hover:text-white lg:hidden transition-colors"
+            aria-label="Toggle navigation menu"
           >
-            {mobileOpen ? <LuX size={20} /> : <LuMenu size={20} />}
+            {mobileOpen ? <LuX size={18} /> : <LuMenu size={18} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile panel */}
+      {/* Mobile Drawer Panel */}
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-[#05080f] px-4 py-4 md:hidden">
-          <div className="mb-3 flex items-center gap-2 rounded-xl border border-[rgba(61,139,255,0.16)] bg-[rgba(4,8,20,0.92)] px-3 py-2">
-            <LuSearch size={15} className="text-[#5a7ab0] shrink-0" />
+        <div className="border-t border-white/5 bg-[#0f0f12]/98 px-4 py-5 lg:hidden animate-in slide-in-from-top duration-200">
+          <form onSubmit={handleSearchSubmit} className="mb-4 flex items-center gap-2 rounded-full border border-white/10 bg-[#16161a] px-4 py-2">
+            <LuSearch size={16} className="text-[#94a3b8] shrink-0" />
             <input
               type="text"
-              placeholder="Search songs, artists..."
-              className="w-full bg-transparent text-[13px] text-[#dde8ff] placeholder:text-[#1e3356] outline-none"
+              value={localSearch}
+              onChange={(e) => {
+                setLocalSearch(e.target.value);
+                if (onSearchChange) onSearchChange(e.target.value);
+              }}
+              placeholder="Search songs, artists, vibes..."
+              className="w-full bg-transparent text-sm text-white placeholder:text-[#94a3b8]/60 outline-none"
             />
-          </div>
+          </form>
 
           <div className="flex flex-col gap-1">
-            {navLinks.map((link) => (
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-[#1f1f22] text-[#ffb1c4] font-semibold"
+                        : "text-[#94a3b8] hover:text-white hover:bg-white/5"
+                    }`
+                  }
+                >
+                  <Icon size={17} />
+                  <span>{link.label}</span>
+                </NavLink>
+              );
+            })}
+
+            {isAuthenticated && (
               <NavLink
-                key={link.to}
-                to={link.to}
+                to="/profile"
                 onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-2 text-sm font-medium ${
-                    isActive ? "text-[#dde8ff]" : "text-[#5a7ab0]"
-                  }`
-                }
+                className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-[#94a3b8] hover:text-white hover:bg-white/5"
               >
-                {link.label}
+                <LuUser size={17} />
+                <span>My Profile</span>
               </NavLink>
-            ))}
+            )}
 
             {!isAuthenticated && (
-              <div className="mt-2 flex flex-col gap-2">
+              <div className="mt-4 flex flex-col gap-2 border-t border-white/5 pt-4">
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg border border-white/10 px-3 py-2 text-center text-sm font-medium text-[#dde8ff]"
+                  className="rounded-xl border border-white/10 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-white/5"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg bg-[#3d8bff] px-3 py-2 text-center text-sm font-semibold text-white"
+                  className="rounded-xl bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] px-4 py-2.5 text-center text-sm font-semibold text-white shadow-lg"
                 >
                   Sign Up
                 </Link>
