@@ -12,7 +12,8 @@ import {
   LuFlame,
   LuLayers,
   LuChevronRight,
-  LuArrowRight
+  LuArrowRight,
+  LuHeart
 } from "react-icons/lu";
 import { useSongs } from "../hook/useSongs.js";
 import { usePlayer } from "../../player/hook/usePlayer.js";
