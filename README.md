@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![NovaVibe Demo 1](https://i.pinimg.com/originals/6a/c7/80/6ac780f0649e8e2497148d50edf432c3.gif)
+![NovaVibe](./Frontend/src/assets/NovaVibe_logo.png)
 
 **NovaVibe** - A mood-based music streaming platform that uses facial expression detection to curate personalized songs and playlists.
 
@@ -258,12 +258,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
 ## 👨‍💻 Author
 
 **NovaVibe Development Team**
@@ -289,59 +283,11 @@ For support, questions, or suggestions, please create an issue in the repository
 
 **Made with ❤️ for music lovers and emotion enthusiasts**
 
-</div>
- ┃ ┃ ┣ hook
- ┃ ┃ ┃ ┗ usePlayer.js
- ┃ ┃ ┗ state
- ┃ ┃ ┃ ┗ player.slice.js
- ┃ ┣ playlists
- ┃ ┃ ┣ hook
- ┃ ┃ ┃ ┗ usePlaylist.js
- ┃ ┃ ┣ pages
- ┃ ┃ ┃ ┣ CreatePlaylist.jsx
- ┃ ┃ ┃ ┣ PlaylistDetail.jsx
- ┃ ┃ ┃ ┗ Playlists.jsx
- ┃ ┃ ┣ service
- ┃ ┃ ┃ ┗ playlistApi.js
- ┃ ┃ ┗ state
- ┃ ┃ ┃ ┗ playlist.slice.js
- ┃ ┣ recentlyPlayed
- ┃ ┃ ┣ hook
- ┃ ┃ ┃ ┗ useRecentlyPlayed.js
- ┃ ┃ ┣ pages
- ┃ ┃ ┃ ┗ RecentlyPlayed.jsx
- ┃ ┃ ┣ service
- ┃ ┃ ┃ ┗ recentlyPlayedApi.js
- ┃ ┃ ┗ state
- ┃ ┃ ┃ ┗ recentlyPlayed.slice.js
- ┃ ┣ Shared
- ┃ ┃ ┣ Components
- ┃ ┃ ┃ ┣ Loading.jsx
- ┃ ┃ ┃ ┗ Navbar.jsx
- ┃ ┃ ┗ services
- ┃ ┃ ┃ ┗ api.js
- ┃ ┗ songs
- ┃ ┃ ┣ components
- ┃ ┃ ┃ ┣ SongCard.jsx
- ┃ ┃ ┃ ┗ SongRow.jsx
- ┃ ┃ ┣ hook
- ┃ ┃ ┃ ┗ useSongs.js
- ┃ ┃ ┣ pages
- ┃ ┃ ┃ ┣ Home.jsx
- ┃ ┃ ┃ ┗ SongsDetail.jsx
- ┃ ┃ ┣ service
- ┃ ┃ ┃ ┗ songApi.js
- ┃ ┃ ┗ state
- ┃ ┃ ┃ ┗ song.slice.js
- ┣ .env
- ┗ main.jsx
- -------
-
 ## 🎯 Tagline
 
 **"Feel the music. Live the vibe."**
 
----
+![NovaVibe Demo 1](https://i.pinimg.com/originals/6a/c7/80/6ac780f0649e8e2497148d50edf432c3.gif)
 
 ## 🚀 Live Demo
 
@@ -455,7 +401,6 @@ server/
 
 ## 🚧 Future Improvements
 
-* [ ] Spotify API integration
 * [ ] Real-time music streaming
 * [ ] Emotion history tracking
 * [ ] AI model accuracy improvements
