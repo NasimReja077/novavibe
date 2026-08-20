@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllSongs,
@@ -14,6 +15,30 @@ export const useSongs = () => {
     (state) => state.songs
   );
 
+  const loadSongs = useCallback((params) => dispatch(
+    fetchAllSongs(params)), [dispatch]
+  );
+  
+  const loadSong = useCallback((id) => dispatch(
+    fetchSongById(id)), [dispatch]
+  );
+
+  const loadMySongs = useCallback((userId) => dispatch(
+    fetchMySongs(userId)), [dispatch]
+  );
+
+  const upload = useCallback((formData) => dispatch(
+    uploadSong(formData)), [dispatch]
+  );
+
+  const clearError = useCallback(() => dispatch(
+    clearSongError()), [dispatch]
+  );
+
+  const clearCurrent = useCallback(() => dispatch(
+    clearCurrentSong()
+  ), [dispatch]);
+
   return {
     songs: list,
     currentSong: current,
@@ -22,11 +47,11 @@ export const useSongs = () => {
     uploading,
     error,
 
-    fetchSongs: (params) => dispatch(fetchAllSongs(params)),
-    fetchSong: (id) => dispatch(fetchSongById(id)),
-    fetchMySongs: (userId) => dispatch(fetchMySongs(userId)),
-    uploadSong: (formData) => dispatch(uploadSong(formData)),
-    clearError: () => dispatch(clearSongError()),
-    clearCurrentSong: () => dispatch(clearCurrentSong()),
+    fetchSongs: loadSongs,
+    fetchSong: loadSong,
+    fetchMySongs: loadMySongs,
+    uploadSong: upload,
+    clearError,
+    clearCurrentSong: clearCurrent,
   };
 };
