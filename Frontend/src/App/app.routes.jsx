@@ -1,21 +1,23 @@
 import { createBrowserRouter, Navigate } from "react-router";
-import { lazy } from "react";
 
 import AppLayout from "./AppLayout.jsx";
 import Protected from "../features/auth/components/Protected.jsx";
 
-const Home = lazy(() => import("../features/songs/pages/Home.jsx"));
-const SongsDetail = lazy(() => import("../features/songs/pages/SongsDetail.jsx"));
-const Playlists = lazy(() => import("../features/playlists/pages/Playlists.jsx"));
-const PlaylistDetail = lazy(() => import("../features/playlists/pages/PlaylistDetail.jsx"));
-const CreatePlaylist = lazy(() => import("../features/playlists/pages/CreatePlaylist.jsx"));
-const RecentlyPlayed = lazy(() => import("../features/recentlyPlayed/pages/RecentlyPlayed.jsx"));
-const Bookmarks = lazy(() => import("../features/bookmarks/pages/Bookmarks.jsx"));
-const Dashboard = lazy(() => import("../features/dashboard/pages/Dashboard.jsx"));
-const UploadSong = lazy(() => import("../features/dashboard/pages/UploadSong.jsx"));
-const Profile = lazy(() => import("../features/auth/pages/Profile.jsx"));
-const Login = lazy(() => import("../features/auth/pages/Login.jsx"));
-const Register = lazy(() => import("../features/auth/pages/Register.jsx"));
+const lazyPage = (loadPage) => async () => ({
+  Component: (await loadPage()).default,
+});
+
+const protectedLazyPage = (loadPage) => async () => {
+  const Page = (await loadPage()).default;
+
+  return {
+    Component: () => (
+      <Protected>
+        <Page />
+      </Protected>
+    ),
+  };
+};
 
 export const routes = createBrowserRouter([
   {
@@ -24,77 +26,53 @@ export const routes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        lazy: lazyPage(() => import("../features/songs/pages/Home.jsx")),
       },
       {
         path: "song/:id",
-        element: <SongsDetail />,
+        lazy: lazyPage(() => import("../features/songs/pages/SongsDetail.jsx")),
       },
       {
         path: "playlists",
-        element: <Playlists />,
+        lazy: lazyPage(() => import("../features/playlists/pages/Playlists.jsx")),
       },
       {
         path: "playlist/:id",
-        element: <PlaylistDetail />,
+        lazy: lazyPage(() => import("../features/playlists/pages/PlaylistDetail.jsx")),
       },
       {
         path: "create-playlist",
-        element: (
-          <Protected>
-            <CreatePlaylist />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/playlists/pages/CreatePlaylist.jsx")),
       },
       {
         path: "recently-played",
-        element: (
-          <Protected>
-            <RecentlyPlayed />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/recentlyPlayed/pages/RecentlyPlayed.jsx")),
       },
       {
         path: "bookmarks",
-        element: (
-          <Protected>
-            <Bookmarks />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/bookmarks/pages/Bookmarks.jsx")),
       },
       {
         path: "dashboard",
-        element: (
-          <Protected>
-            <Dashboard />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/dashboard/pages/Dashboard.jsx")),
       },
       {
         path: "upload-song",
-        element: (
-          <Protected>
-            <UploadSong />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/dashboard/pages/UploadSong.jsx")),
       },
       {
         path: "profile",
-        element: (
-          <Protected>
-            <Profile />
-          </Protected>
-        ),
+        lazy: protectedLazyPage(() => import("../features/auth/pages/Profile.jsx")),
       },
     ],
   },
   {
     path: "/login",
-    element: <Login />,
+    lazy: lazyPage(() => import("../features/auth/pages/Login.jsx")),
   },
   {
     path: "/register",
-    element: <Register />,
+    lazy: lazyPage(() => import("../features/auth/pages/Register.jsx")),
   },
   {
     path: "*",
