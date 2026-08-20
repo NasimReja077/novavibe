@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { RouterProvider } from "react-router"
 import { routes } from "./app.routes.jsx"
 import Providers from "./providers.jsx"
@@ -7,7 +8,9 @@ const App = () => {
   return (
     <>
     <Providers>
-      <RouterProvider router={routes}/>
+      <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Loading...</div>}>
+        <RouterProvider router={routes}/>
+      </Suspense>
       <Toaster
         position="top-right"
         reverseOrder={false}
