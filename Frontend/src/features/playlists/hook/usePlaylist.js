@@ -4,6 +4,7 @@ import {
   fetchAllPlaylists,
   fetchPlaylistById,
   createPlaylist,
+  deletePlaylist,
   clearPlaylistError,
   clearCurrentPlaylist,
 } from "../state/playlist.slice.js";
@@ -26,6 +27,10 @@ export const usePlaylists = () => {
     createPlaylist(formData)), [dispatch]
   );
 
+  const remove = useCallback((id) => dispatch(
+    deletePlaylist(id)), [dispatch]
+  );
+
   const clearError = useCallback(() => dispatch(
     clearPlaylistError()), [dispatch]
   );
@@ -44,6 +49,7 @@ export const usePlaylists = () => {
     fetchPlaylists: loadPlaylists,
     fetchPlaylist: loadPlaylist,
     createPlaylist: create,
+    deletePlaylist: remove,
     clearError,
     clearCurrentPlaylist: clearCurrent,
   };
