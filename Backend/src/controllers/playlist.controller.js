@@ -1,5 +1,5 @@
 import Playlist from "../models/playlist.model.js";
-import { uploadToImageKit } from "../services/storage.service.js";
+import { deleteFromImageKit, uploadToImageKit } from "../services/storage.service.js";
 
 export const createPlaylistSongs = async (req, res) => {
   try {
@@ -111,3 +111,36 @@ export const getPlaylistSongById = async (req, res) => {
     });
   }
 };
+
+export const deletePlaylist = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const playlist = await Playlist.findOne({ _id: id, isActive: true });
+
+    if (!playlist) {
+      return res.status(404).json({
+        success: false,
+        message: "Playlist not found",
+      });
+    }
+
+    playlist.isActive = false;
+    await playlist.save();
+
+    if (playlist.thumbnailFileId) {
+      await deleteFromImageKit(playlist.thumbnailFileId);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Playlist deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error in deletePlaylist:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete playlist",
+    });
+  }
+};
+
