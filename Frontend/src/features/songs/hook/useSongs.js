@@ -5,6 +5,7 @@ import {
   fetchSongById,
   fetchMySongs,
   uploadSong,
+  deleteSong,
   clearSongError,
   clearCurrentSong,
 } from "../state/song.slice.js";
@@ -31,6 +32,10 @@ export const useSongs = () => {
     uploadSong(formData)), [dispatch]
   );
 
+  const remove = useCallback((id) => dispatch(
+    deleteSong(id)), [dispatch]
+  );
+
   const clearError = useCallback(() => dispatch(
     clearSongError()), [dispatch]
   );
@@ -51,6 +56,7 @@ export const useSongs = () => {
     fetchSong: loadSong,
     fetchMySongs: loadMySongs,
     uploadSong: upload,
+    deleteSong: remove,
     clearError,
     clearCurrentSong: clearCurrent,
   };

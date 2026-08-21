@@ -58,6 +58,20 @@ export const uploadSong = createAsyncThunk(
     }
   }
 );
+
+export const deleteSong = createAsyncThunk(
+  "songs/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await songApi.remove(id);
+      return id;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete song"
+      );
+    }
+  }
+);
  
 const initialState = {
   list: [],
@@ -134,6 +148,14 @@ const songSlice = createSlice({
       })
       .addCase(uploadSong.rejected, (state, action) => {
         state.uploading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteSong.fulfilled, (state, action) => {
+        state.mySongs = state.mySongs.filter((song) => song._id !== action.payload);
+        state.list = state.list.filter((song) => song._id !== action.payload);
+        if (state.current?._id === action.payload) state.current = null;
+      })
+      .addCase(deleteSong.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
