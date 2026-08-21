@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { LuPlay, LuPause, LuHeart, LuInfo } from "react-icons/lu";
+import { LuPlay, LuPause, LuHeart, LuInfo, LuTrash2 } from "react-icons/lu";
 
 const moodBadgeStyles = {
   happy: "bg-[#d62b70]/15 text-[#ffb1c4] border-[#d62b70]/30",
@@ -23,6 +23,7 @@ const SongRow = ({
   isBookmarked,
   onPlay,
   onToggleBookmark,
+  onDelete,
 }) => {
   return (
     <div
@@ -125,6 +126,17 @@ const SongRow = ({
               size={16}
               className={isBookmarked ? "fill-[#d62b70] text-[#d62b70]" : ""}
             />
+          </button>
+        )}
+
+        {onDelete && (
+          <button
+            onClick={() => onDelete(song)}
+            className="text-[#94a3b8] hover:text-red-400 transition-colors p-1"
+            aria-label={`Delete ${song.title}`}
+            title="Delete song"
+          >
+            <LuTrash2 size={16} />
           </button>
         )}
       </div>
