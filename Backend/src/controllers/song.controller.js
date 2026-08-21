@@ -1,5 +1,9 @@
 import Song from "../models/song.model.js";
-import { uploadSongFiles, readSongMetadata } from "../services/storage.service.js";
+import {
+  deleteFromImageKit,
+  readSongMetadata,
+  uploadSongFiles,
+} from "../services/storage.service.js";
 
 const normalizeGenres = (value) => {
   if (Array.isArray(value)) {
@@ -140,6 +144,52 @@ export const getAllSongsByUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: error.message || "Internal server error",
+    });
+  }
+};
+
+export const deleteSong = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const song = await Song.findOne({
+      _id: id,
+      uploadedBy: userId,
+      isActive: true,
+    });
+
+    if (!song) {
+      return res.status(404).json({
+        success: false,
+        message: "Song not found",
+      });
+    }
+
+    song.isActive = false;
+    await song.save();
+
+    await Promise.all([
+      song.posterFileId ? deleteFromImageKit(song.posterFileId) : Promise.resolve(),
+      song.songFileId ? deleteFromImageKit(song.songFileId) : Promise.resolve(),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Song deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error in deleteSong:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete song",
     });
   }
 };
