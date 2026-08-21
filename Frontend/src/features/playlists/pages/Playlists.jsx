@@ -1,19 +1,24 @@
 import { useEffect } from "react";
 import { Link } from "react-router";
-import { LuPlus, LuLayers, LuPlay, LuMusic } from "react-icons/lu";
+import { LuPlus, LuLayers, LuPlay, LuMusic, LuTrash2 } from "react-icons/lu";
 import { usePlaylists } from "../hook/usePlaylist.js";
 import { usePlayer } from "../../player/hook/usePlayer.js";
 import { useAuth } from "../../auth/hook/useAuth.js";
 import Loading from "../../Shared/Components/Loading.jsx";
 
 const Playlists = () => {
-  const { playlists, loading, fetchPlaylists } = usePlaylists();
+  const { playlists, loading, fetchPlaylists, deletePlaylist } = usePlaylists();
   const { playSong } = usePlayer();
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     fetchPlaylists();
   }, [fetchPlaylists]);
+
+  const handleDelete = async (playlist) => {
+    if (!window.confirm(`Delete playlist "${playlist.title}"?`)) return;
+    await deletePlaylist(playlist._id);
+  };
 
   if (loading && playlists.length === 0) {
     return <Loading message="Loading playlists..." />;
@@ -111,6 +116,14 @@ const Playlists = () => {
                     {playlist.songCount || playlist.songs?.length || 0} tracks
                   </p>
                 </Link>
+                <button
+                  onClick={() => handleDelete(playlist)}
+                  className="mt-2 inline-flex items-center gap-1 text-[11px] text-[#94a3b8] hover:text-red-400"
+                  title="Delete playlist"
+                >
+                  <LuTrash2 size={13} />
+                  <span>Delete</span>
+                </button>
               </div>
             ))}
           </div>

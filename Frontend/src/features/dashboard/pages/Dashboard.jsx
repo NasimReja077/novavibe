@@ -7,7 +7,8 @@ import {
   LuHeart,
   LuUser,
   LuSparkles,
-  LuUpload
+  LuUpload,
+  LuTrash2
 } from "react-icons/lu";
 import { AiTwotonePlusCircle } from "react-icons/ai";
 import { useAuth } from "../../auth/hook/useAuth.js";
@@ -19,8 +20,8 @@ import SongRow from "../../songs/components/SongRow.jsx";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { mySongs, fetchMySongs } = useSongs();
-  const { playlists, fetchPlaylists } = usePlaylists();
+  const { mySongs, fetchMySongs, deleteSong } = useSongs();
+  const { playlists, fetchPlaylists, deletePlaylist } = usePlaylists();
   const { bookmarks, fetchBookmarks } = useBookmarks();
   const { currentSong, isPlaying, playSong, togglePlay } = usePlayer();
 
@@ -38,6 +39,16 @@ const Dashboard = () => {
     } else {
       playSong(song, mySongs);
     }
+  };
+
+  const handleDeleteSong = async (song) => {
+    if (!window.confirm(`Delete "${song.title}"?`)) return;
+    await deleteSong(song._id);
+  };
+
+  const handleDeletePlaylist = async (playlist) => {
+    if (!window.confirm(`Delete playlist "${playlist.title}"?`)) return;
+    await deletePlaylist(playlist._id);
   };
 
   return (
@@ -198,6 +209,7 @@ const Dashboard = () => {
                   isActive={currentSong?._id === song._id}
                   isPlaying={currentSong?._id === song._id && isPlaying}
                   onPlay={handlePlay}
+                  onDelete={handleDeleteSong}
                 />
               ))}
             </div>
@@ -237,25 +249,34 @@ const Dashboard = () => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {playlists.map((pl) => (
-                <Link
+                <div
                   key={pl._id}
-                  to={`/playlist/${pl._id}`}
                   className="group rounded-2xl bg-[#16161a] border border-white/5 hover:border-white/20 p-3 transition-all hover:-translate-y-1"
                 >
-                  <div className="aspect-square rounded-xl overflow-hidden mb-3 bg-[#1f1f22]">
-                    <img
-                      src={pl.thumbnailUrl || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop"}
-                      alt={pl.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                  </div>
-                  <h3 className="truncate text-sm font-bold text-white group-hover:text-[#ffb1c4]">
-                    {pl.title}
-                  </h3>
-                  <p className="text-[11px] text-[#94a3b8] mt-0.5">
-                    {pl.songCount || pl.songs?.length || 0} tracks
-                  </p>
-                </Link>
+                  <Link to={`/playlist/${pl._id}`} className="block">
+                    <div className="aspect-square rounded-xl overflow-hidden mb-3 bg-[#1f1f22]">
+                      <img
+                        src={pl.thumbnailUrl || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop"}
+                        alt={pl.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                    <h3 className="truncate text-sm font-bold text-white group-hover:text-[#ffb1c4]">
+                      {pl.title}
+                    </h3>
+                    <p className="text-[11px] text-[#94a3b8] mt-0.5">
+                      {pl.songCount || pl.songs?.length || 0} tracks
+                    </p>
+                  </Link>
+                  <button
+                    onClick={() => handleDeletePlaylist(pl)}
+                    className="mt-2 inline-flex items-center gap-1 text-[11px] text-[#94a3b8] hover:text-red-400"
+                    title="Delete playlist"
+                  >
+                    <LuTrash2 size={13} />
+                    <span>Delete</span>
+                  </button>
+                </div>
               ))}
             </div>
           )}

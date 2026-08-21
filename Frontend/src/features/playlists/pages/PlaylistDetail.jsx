@@ -5,7 +5,8 @@ import {
   LuPause,
   LuArrowLeft,
   LuMusic,
-  LuCalendar
+  LuCalendar,
+  LuTrash2
 } from "react-icons/lu";
 import { usePlaylists } from "../hook/usePlaylist.js";
 import { usePlayer } from "../../player/hook/usePlayer.js";
@@ -16,7 +17,7 @@ import Loading from "../../Shared/Components/Loading.jsx";
 
 const PlaylistDetail = () => {
   const { id } = useParams();
-  const { currentPlaylist, playlists, loading, fetchPlaylist, fetchPlaylists } = usePlaylists();
+  const { currentPlaylist, playlists, loading, fetchPlaylist, fetchPlaylists, deletePlaylist } = usePlaylists();
   const { currentSong, isPlaying, playSong, togglePlay } = usePlayer();
   const { isBookmarked, addBookmark, removeBookmark } = useBookmarks();
   const { isAuthenticated } = useAuth();
@@ -74,6 +75,12 @@ const PlaylistDetail = () => {
     if (!isAuthenticated) return;
     if (isBookmarked(songId)) removeBookmark(songId);
     else addBookmark(songId);
+  };
+
+  const handleDeletePlaylist = async () => {
+    if (!window.confirm(`Delete playlist "${targetPlaylist.title}"?`)) return;
+    await deletePlaylist(targetPlaylist._id);
+    window.history.back();
   };
 
   return (
@@ -142,6 +149,14 @@ const PlaylistDetail = () => {
                       <span>Play All Songs</span>
                     </>
                   )}
+                </button>
+                <button
+                  onClick={handleDeletePlaylist}
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-full border border-white/10 text-[#94a3b8] hover:text-red-400 hover:border-red-400/40 font-bold text-xs md:text-sm transition-colors"
+                  title="Delete playlist"
+                >
+                  <LuTrash2 size={16} />
+                  <span>Delete</span>
                 </button>
               </div>
             </div>
