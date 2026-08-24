@@ -3,14 +3,17 @@ import { RouterProvider } from "react-router"
 import { routes } from "./app.routes.jsx"
 import Providers from "./providers.jsx"
 import { Toaster } from "react-hot-toast";
+import ErrorBoundary from "../features/Shared/Components/ErrorBoundary.jsx";
 
 const App = () => {
   return (
     <>
     <Providers>
-      <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Loading...</div>}>
-        <RouterProvider router={routes}/>
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Loading...</div>}>
+          <RouterProvider router={routes}/>
+        </Suspense>
+      </ErrorBoundary>
       <Toaster
         position="top-right"
         reverseOrder={false}

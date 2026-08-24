@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 
 import AppLayout from "./AppLayout.jsx";
 import Protected from "../features/auth/components/Protected.jsx";
+import { RouteErrorFallback } from "../features/Shared/Components/ErrorFallback.jsx";
 
 const lazyPage = (loadPage) => async () => ({
   Component: (await loadPage()).default,
@@ -23,6 +24,7 @@ export const routes = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       {
         index: true,
@@ -68,10 +70,12 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/login",
+    errorElement: <RouteErrorFallback />,
     lazy: lazyPage(() => import("../features/auth/pages/Login.jsx")),
   },
   {
     path: "/register",
+    errorElement: <RouteErrorFallback />,
     lazy: lazyPage(() => import("../features/auth/pages/Register.jsx")),
   },
   {
