@@ -29,6 +29,22 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif;
   }
+
+  /* Tailwind's Preflight resets <button> to cursor: default, which is why
+     custom buttons across the app don't show a pointer cursor despite
+     looking clickable. This restores it globally instead of adding
+     `cursor-pointer` by hand to every button in every file. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
 
 /* Custom scrollbar */
