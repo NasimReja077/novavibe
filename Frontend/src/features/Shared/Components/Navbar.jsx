@@ -21,8 +21,8 @@ const navLinks = [
   { label: "Home", to: "/", icon: LuMusic },
   { label: "Playlists", to: "/playlists", icon: LuSparkles },
   { label: "Bookmarks", to: "/bookmarks", icon: LuHeart },
-  { label: "Recent", to: "/recently-played", icon: LuClock },
-  { label: "Dashboard", to: "/dashboard", icon: LuLayoutDashboard },
+  // { label: "Recent", to: "/recently-played", icon: LuClock },
+  // { label: "Dashboard", to: "/dashboard", icon: LuLayoutDashboard },
 ];
 
 const Navbar = ({ onSearchChange, searchTerm = "" }) => {
@@ -74,12 +74,6 @@ const Navbar = ({ onSearchChange, searchTerm = "" }) => {
         
         {/* Brand Logo with Text Design */}
         <Link to="/" className="flex items-center gap-2 shrink-0 group">
-          <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[#d62b70]/20 to-[#2bd6d6]/20 border border-[#d62b70]/30 group-hover:border-[#d62b70] transition-colors">
-            <span className="font-['Bebas_Neue'] text-xl tracking-wider text-[#ffb1c4] group-hover:text-white transition-colors">
-              NV
-            </span>
-            <div className="absolute -bottom-0.5 w-4 h-0.5 bg-[#d62b70] rounded-full shadow-[0_0_8px_#d62b70]" />
-          </div>
           
           <div className="flex items-baseline gap-1.5">
             <span className="font-['Montserrat'] font-black text-xl md:text-2xl tracking-tight bg-gradient-to-r from-white via-[#e4e1e6] to-[#ffb1c4] bg-clip-text text-transparent group-hover:from-white group-hover:to-[#2bd6d6] transition-all">
