@@ -5,7 +5,8 @@ import {
   LuArrowLeft,
   LuUpload,
   LuMusic,
-  LuImage
+  LuImage,
+  LuX,
 } from "react-icons/lu";
 import { useSongs } from "../../songs/hook/useSongs.js";
 import { GENRE_OPTIONS, LANGUAGE_OPTIONS } from "../../songs/constants/genres.js";
@@ -28,6 +29,7 @@ const UploadSong = () => {
   const [songFile, setSongFile] = useState(null);
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("");
+  const [isPosterDragging, setIsPosterDragging] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +47,22 @@ const UploadSong = () => {
       setPosterFile(file);
       setPosterPreview(URL.createObjectURL(file));
     }
+  };
+
+  const handlePosterDrop = (e) => {
+    e.preventDefault();
+    setIsPosterDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file?.type.startsWith("image/")) {
+      setPosterFile(file);
+      setPosterPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearPoster = () => {
+    setPosterFile(null);
+    setPosterPreview("");
+    setIsPosterDragging(false);
   };
 
   const handleSubmit = async (e) => {
@@ -83,41 +101,48 @@ const UploadSong = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f12] text-[#e4e1e6] pb-36">
-      <div className="mx-auto max-w-3xl px-4 md:px-8 py-8">
+    <div className="min-h-screen bg-[#0c0c0f] text-[#e4e1e6] pb-32">
+      {/* subtle top glow */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-64 bg-gradient-to-b from-[#d62b70]/8 to-transparent" />
 
-        {/* Back Link */}
+      <div className="relative mx-auto max-w-3xl px-4 md:px-8 py-10">
+        {/* Back */}
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#94a3b8] hover:text-white mb-6 transition-colors cursor-pointer"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-[#94a3b8] hover:text-white mb-8 transition-colors"
         >
-          <LuArrowLeft size={16} />
-          <span>Back to Dashboard</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
+            <LuArrowLeft size={15} />
+          </span>
+          Back to Dashboard
         </Link>
 
-        {/* Form Card */}
-        <div className="rounded-3xl bg-[#16161a] border border-white/10 p-6 md:p-10 shadow-2xl">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-[#d62b70]/20 border border-[#d62b70]/40 flex items-center justify-center text-[#ffb1c4]">
-              <LuUpload size={20} />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black font-['Montserrat'] text-white tracking-tight">
-                Upload New Song
-              </h1>
-              <p className="text-xs text-[#94a3b8]">
-                Publish your track and tag it with real-time mood intelligence.
-              </p>
+        {/* Main Card */}
+        <div className="rounded-3xl bg-[#141417]/90 border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] backdrop-blur-sm overflow-hidden">
+          {/* Header */}
+          <div className="px-6 md:px-10 pt-8 pb-6 border-b border-white/5">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#d62b70]/25 to-[#8b5cf6]/20 border border-[#d62b70]/30 text-[#ffb1c4]">
+                <LuUpload size={22} />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+                  Upload New Song
+                </h1>
+                <p className="mt-1 text-sm text-[#94a3b8]">
+                  Publish your track and tag it with real-time mood intelligence.
+                </p>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
-
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="px-6 md:px-10 py-8 space-y-7">
             {/* Title & Artist */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
-                  Song Title *
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                  Song Title <span className="text-[#d62b70]">*</span>
                 </label>
                 <input
                   type="text"
@@ -126,13 +151,13 @@ const UploadSong = () => {
                   onChange={handleChange}
                   placeholder="e.g. Let Me Down Slowly"
                   required
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-[#94a3b8]/50 focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none transition-all"
+                  className="w-full rounded-xl bg-[#1c1c20] border border-white/10 px-4 py-3.5 text-sm text-white placeholder:text-[#64748b] focus:border-[#d62b70]/60 focus:ring-2 focus:ring-[#d62b70]/20 outline-none transition-all"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
-                  Artist / Creator *
+              <div className="space-y-2">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                  Artist / Creator <span className="text-[#d62b70]">*</span>
                 </label>
                 <input
                   type="text"
@@ -141,43 +166,43 @@ const UploadSong = () => {
                   onChange={handleChange}
                   placeholder="e.g. Alec Benjamin"
                   required
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-[#94a3b8]/50 focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none transition-all"
+                  className="w-full rounded-xl bg-[#1c1c20] border border-white/10 px-4 py-3.5 text-sm text-white placeholder:text-[#64748b] focus:border-[#d62b70]/60 focus:ring-2 focus:ring-[#d62b70]/20 outline-none transition-all"
                 />
               </div>
             </div>
 
             {/* Mood & Language */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
-                  Primary Mood Tag *
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                  Primary Mood Tag <span className="text-[#d62b70]">*</span>
                 </label>
                 <select
                   name="mood"
                   value={formData.mood}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white cursor-pointer focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none capitalize"
+                  className="w-full appearance-none rounded-xl bg-[#1c1c20] border border-white/10 px-4 py-3.5 text-sm text-white capitalize cursor-pointer focus:border-[#d62b70]/60 focus:ring-2 focus:ring-[#d62b70]/20 outline-none transition-all"
                 >
                   {MOOD_OPTIONS.map((m) => (
-                    <option key={m} value={m} className="bg-[#16161a] text-white">
-                      {m.toUpperCase()}
+                    <option key={m} value={m} className="bg-[#16161a]">
+                      {m.charAt(0).toUpperCase() + m.slice(1)}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
+              <div className="space-y-2">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
                   Song Language
                 </label>
                 <select
                   name="songLanguage"
                   value={formData.songLanguage}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white cursor-pointer capitalize focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none"
+                  className="w-full appearance-none rounded-xl bg-[#1c1c20] border border-white/10 px-4 py-3.5 text-sm text-white capitalize cursor-pointer focus:border-[#d62b70]/60 focus:ring-2 focus:ring-[#d62b70]/20 outline-none transition-all"
                 >
                   {LANGUAGE_OPTIONS.map((lang) => (
-                    <option key={lang} value={lang} className="bg-[#16161a] text-white capitalize">
+                    <option key={lang} value={lang} className="bg-[#16161a]">
                       {lang.charAt(0).toUpperCase() + lang.slice(1)}
                     </option>
                   ))}
@@ -185,7 +210,7 @@ const UploadSong = () => {
               </div>
             </div>
 
-            {/* Genre multi-select */}
+            {/* Genre */}
             <MultiSelectDropdown
               label="Genre(s) *"
               options={GENRE_OPTIONS}
@@ -194,80 +219,149 @@ const UploadSong = () => {
               placeholder="Select one or more genres"
             />
 
-            {/* Audio File Upload */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
-                Audio File (MP3 / WAV / OGG) *
+            {/* Audio Upload Zone */}
+            <div className="space-y-2">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                Audio File (MP3 / WAV / OGG) <span className="text-[#d62b70]">*</span>
               </label>
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={handleSongFileChange}
-                required
-                className="w-full rounded-xl bg-[#1f1f22] border border-dashed border-white/20 p-3 text-xs text-[#94a3b8] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#d62b70] file:text-white file:cursor-pointer hover:file:brightness-110 cursor-pointer"
-              />
+
+              <label className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-[#1c1c20]/60 px-6 py-8 cursor-pointer hover:border-[#d62b70]/40 hover:bg-[#1c1c20] transition-all">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleSongFileChange}
+                  required
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#d62b70]/15 text-[#ffb1c4] group-hover:scale-105 transition-transform">
+                  <LuMusic size={22} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-white">
+                    {songFile ? "Change audio file" : "Click to upload audio"}
+                  </p>
+                  <p className="mt-1 text-xs text-[#64748b]">
+                    MP3, WAV or OGG • Max recommended 50 MB
+                  </p>
+                </div>
+              </label>
+
               {songFile && (
-                <p className="text-[11px] text-[#ffb1c4] mt-1.5 flex items-center gap-1">
-                  <LuMusic size={12} />
-                  <span>Selected: {songFile.name} ({(songFile.size / 1024 / 1024).toFixed(2)} MB)</span>
-                </p>
+                <div className="flex items-center gap-3 rounded-xl bg-[#d62b70]/10 border border-[#d62b70]/20 px-4 py-3">
+                  <LuMusic size={16} className="text-[#ffb1c4] shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-[#ffb1c4] truncate">
+                      {songFile.name}
+                    </p>
+                    <p className="text-[11px] text-[#94a3b8]">
+                      {(songFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Poster Artwork Upload */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
+            {/* Poster Artwork */}
+            <div className="space-y-3">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8]">
                 Poster Artwork (JPG / PNG)
               </label>
-              <div className="flex items-center gap-4">
-                <div className="relative w-20 h-20 rounded-2xl bg-[#1f1f22] border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
-                  {posterPreview ? (
-                    <img
-                      src={posterPreview}
-                      alt="Poster preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <LuImage className="text-[#94a3b8]" size={24} />
-                  )}
-                </div>
 
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePosterFileChange}
-                    id="poster-upload"
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="poster-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white cursor-pointer transition-colors"
-                  >
-                    <LuImage size={14} />
-                    <span>Select Artwork</span>
-                  </label>
-                  <p className="text-[11px] text-[#94a3b8] mt-1">
-                    Square 500x500 or higher recommended.
-                  </p>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsPosterDragging(true);
+                }}
+                onDragLeave={() => setIsPosterDragging(false)}
+                onDrop={handlePosterDrop}
+                className={`relative overflow-hidden rounded-2xl border border-dashed p-4 transition-all ${
+                  isPosterDragging
+                    ? "border-[#d62b70] bg-[#d62b70]/10"
+                    : "border-white/15 bg-[#1c1c20]/60 hover:border-[#d62b70]/50 hover:bg-[#1c1c20]"
+                }`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePosterFileChange}
+                  id="poster-upload"
+                  className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                />
+
+                <div className="flex items-center gap-4">
+                  <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#121216] shadow-inner">
+                    {posterPreview ? (
+                      <img
+                        src={posterPreview}
+                        alt="Poster preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-[#64748b]">
+                        <LuImage size={28} />
+                        <span className="text-[10px] uppercase tracking-wider">Preview</span>
+                      </div>
+                    )}
+                    {posterPreview && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          clearPoster();
+                        }}
+                        className="absolute right-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white shadow-lg transition-colors hover:bg-[#d62b70]"
+                        aria-label="Remove poster artwork"
+                      >
+                        <LuX size={14} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <LuUpload size={16} className="text-[#ffb1c4]" />
+                      <p className="text-sm font-semibold text-white">
+                        {posterPreview ? "Artwork selected" : "Drop your artwork here"}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-[#94a3b8]">
+                      {posterFile?.name || "or click anywhere to browse from your device"}
+                    </p>
+                    <p className="mt-2 text-[11px] text-[#64748b]">
+                      JPG or PNG · Square 500 × 500 or higher recommended
+                    </p>
+                    {posterFile && (
+                      <p className="mt-1 text-[11px] text-[#ffb1c4]">
+                        {(posterFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="pt-6 border-t border-white/10 flex items-center justify-end gap-3">
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pt-6 border-t border-white/5">
               <Link
                 to="/dashboard"
-                className="px-5 py-2.5 rounded-full border border-white/10 text-xs font-semibold text-[#94a3b8] hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-[#94a3b8] hover:text-white hover:bg-white/5 transition-colors"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={uploading}
-                className="px-8 py-3 rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] text-white text-xs md:text-sm font-bold shadow-[0_4px_25px_rgba(214,43,112,0.45)] hover:brightness-110 active:scale-95 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="relative overflow-hidden rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] px-8 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(214,43,112,0.35)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
               >
-                {uploading ? "Uploading Audio Track..." : "Publish Track"}
+                {uploading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Uploading…
+                  </span>
+                ) : (
+                  "Publish Track"
+                )}
               </button>
             </div>
           </form>
