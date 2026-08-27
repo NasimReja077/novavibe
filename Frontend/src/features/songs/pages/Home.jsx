@@ -109,120 +109,129 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-[#0f0f12] text-[#e4e1e6] pb-36">
       <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-6">
-        
+
         {/* Main Grid: Left Fluid Content (9 cols) + Right Contextual Sidebar (3 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_340px] gap-8 items-start">
-          
+
           {/* LEFT MAIN CONTENT */}
           <div className="min-w-0 flex flex-col gap-8">
-            
+
             {/* HERO SPOTLIGHT BANNER */}
             {featuredSong && (
-              <section className="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 group min-h-[360px] md:min-h-[400px] flex items-end">
+
+              <section className="relative w-full overflow-hidden rounded-3xl border border-white/10 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] group min-h-[380px] md:min-h-[440px] flex items-end">
                 {/* Background Artwork */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-[15s] ease-out group-hover:scale-105"
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-[12s] ease-out group-hover:scale-105 will-change-transform"
+
                   style={{
-                    backgroundImage: `url(${featuredSong.posterUrl || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop"})`,
+                    backgroundImage: `url(${featuredSong.posterUrl ||
+                      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1400&auto=format&fit=crop"})`,
                   }}
                 />
 
-                {/* Ambient Gradients */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f12] via-[#0f0f12]/75 to-black/30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0f0f12]/90 via-[#0f0f12]/40 to-transparent" />
+                {/* Multi-layer ambient overlays for depth + readability */}
 
-                {/* Hero Content Card */}
-                <div className="relative z-10 p-6 md:p-8 w-full max-w-2xl">
-                  {/* Now Playing / Featured Pill */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1b1b1e]/80 backdrop-blur-md border border-white/15 text-xs font-semibold text-white mb-3 shadow-md">
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#d62b70] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#d62b70]" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0c0c0f] via-[#0c0c0f]/70 to-transparent" />
+
+                <div className="absolute inset-0 bg-linear-to-r from-[#0c0c0f]/95 via-[#0c0c0f]/50 to-transparent" />
+
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-[#d62b70]/15 via-transparent to-transparent opacity-70" />
+
+                {/* Soft bottom glow */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#d62b70]/10 to-transparent pointer-events-none" />
+
+                {/* Content */}
+                <div className="relative z-10 w-full p-6 sm:p-8 md:p-10 max-w-3xl">
+                  {/* Status Pill */}
+                  <div className="inline-flex items-center gap-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3.5 py-1.5 mb-5 shadow-lg">
+
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#d62b70] opacity-70" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d62b70]" />
                     </span>
-                    <span className="text-[#ffb1c4] uppercase tracking-wider text-[10px]">
+
+                    <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#ffb1c4]">
                       {currentSong?._id === featuredSong._id && isPlaying ? "Now Playing" : "Featured Vibe"}
                     </span>
+
                     {isPlaying && currentSong?._id === featuredSong._id && (
-                      <div className="flex items-end gap-0.5 h-3 ml-1">
-                        <div className="w-0.5 bg-[#d62b70] h-full animate-eq-1 rounded-full" />
-                        <div className="w-0.5 bg-[#2bd6d6] h-full animate-eq-2 rounded-full" />
-                        <div className="w-0.5 bg-[#8b5cf6] h-full animate-eq-3 rounded-full" />
+                      <div className="flex items-end gap-[3px] h-3.5 ml-0.5">
+                        <span className="w-[3px] bg-[#d62b70] h-full rounded-full animate-eq-1" />
+                        <span className="w-[3px] bg-[#2bd6d6] h-[70%] rounded-full animate-eq-2" />
+                        <span className="w-[3px] bg-[#8b5cf6] h-full rounded-full animate-eq-3" />
                       </div>
                     )}
                   </div>
 
-                  {/* Title & Artist */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-['Montserrat'] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] tracking-tight">
+                  {/* Title */}
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black font-['Montserrat'] text-white leading-[1.1] tracking-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
                     {featuredSong.title}
                   </h1>
-                  <h2 className="text-lg md:text-2xl font-semibold text-[#94a3b8] mt-1 drop-shadow-md">
+
+                  {/* Artist */}
+                  <p className="mt-2 text-lg sm:text-xl md:text-2xl font-medium text-[#cbd5e1]/90 drop-shadow-md">
                     {featuredSong.songArtist}
-                  </h2>
+                  </p>
 
-                  {/* Metadata Chips Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-white/10">
-                    <div>
-                      <span className="block text-[10px] uppercase font-bold text-[#94a3b8] tracking-widest">
-                        Artist
-                      </span>
-                      <span className="block truncate text-xs md:text-sm font-semibold text-white mt-0.5">
-                        {featuredSong.songArtist}
-                      </span>
-                    </div>
-
-                    <div>
-                      <span className="block text-[10px] uppercase font-bold text-[#94a3b8] tracking-widest">
+                  {/* Metadata Pills */}
+                  <div className="mt-6 flex flex-wrap gap-2.5">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white/8 backdrop-blur-sm border border-white/10 px-3.5 py-1.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#94a3b8]">
                         Mood
                       </span>
-                      <span className="block capitalize text-xs md:text-sm font-bold text-[#ffb1c4] mt-0.5">
+                      <span className="text-xs font-bold capitalize text-[#ffb1c4]">
                         {featuredSong.mood || "Balanced"}
                       </span>
                     </div>
 
-                    <div>
-                      <span className="block text-[10px] uppercase font-bold text-[#94a3b8] tracking-widest">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white/8 backdrop-blur-sm border border-white/10 px-3.5 py-1.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#94a3b8]">
                         Genre
                       </span>
-                      <span className="block truncate text-xs md:text-sm font-semibold text-[#2bd6d6] mt-0.5">
+                      <span className="text-xs font-bold text-[#2bd6d6] max-w-[140px] truncate">
                         {featuredSong.genre?.join(", ") || "Pop"}
                       </span>
                     </div>
 
-                    <div>
-                      <span className="block text-[10px] uppercase font-bold text-[#94a3b8] tracking-widest">
-                        Language
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-white/8 backdrop-blur-sm border border-white/10 px-3.5 py-1.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#94a3b8]">
+                        Lang
                       </span>
-                      <span className="block capitalize text-xs md:text-sm font-semibold text-white mt-0.5">
+                      <span className="text-xs font-bold capitalize text-white">
                         {featuredSong.songLanguage || "English"}
                       </span>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="mt-6 flex items-center gap-3">
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
                     <button
                       onClick={() => handlePlay(featuredSong)}
-                      className="flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#d62b70] via-[#d62b70] to-[#8b5cf6] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_25px_rgba(214,43,112,0.45)] hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-200"
+                      className="group/btn relative flex items-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] px-7 py-3.5 text-sm font-bold text-white shadow-[0_8px_30px_rgba(214,43,112,0.4)] hover:brightness-110 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200"
                     >
+                      {/* subtle shine */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+
                       {currentSong?._id === featuredSong._id && isPlaying ? (
                         <>
-                          <LuPause size={17} />
-                          <span>Pause</span>
+                          <LuPause size={18} className="relative z-10" />
+                          <span className="relative z-10">Pause</span>
                         </>
                       ) : (
                         <>
-                          <LuPlay size={17} className="ml-0.5" />
-                          <span>Play Now</span>
+                          <LuPlay size={18} className="relative z-10 ml-0.5" />
+                          <span className="relative z-10">Play Now</span>
                         </>
                       )}
                     </button>
 
                     <Link
                       to={`/song/${featuredSong._id}`}
-                      className="flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md px-5 py-3 text-sm font-semibold text-white border border-white/10 hover:border-white/20 transition-all duration-200"
+                      className="flex items-center gap-2 rounded-full bg-white/8 hover:bg-white/15 backdrop-blur-md border border-white/12 hover:border-white/25 px-5 py-3.5 text-sm font-semibold text-white transition-all duration-200"
                     >
-                      <LuSparkles size={15} className="text-[#ffb1c4]" />
-                      <span>Details & Moods</span>
+                      <LuSparkles size={16} className="text-[#ffb1c4]" />
+                      <span>Details</span>
                     </Link>
                   </div>
                 </div>
@@ -258,11 +267,10 @@ const Home = () => {
                     <div
                       key={m.key}
                       onClick={() => setActiveMood(isSelected ? null : m.key)}
-                      className={`relative flex items-center gap-3.5 p-4 rounded-2xl cursor-pointer transition-all duration-300 border ${
-                        isSelected
+                      className={`relative flex items-center gap-3.5 p-4 rounded-2xl cursor-pointer transition-all duration-300 border ${isSelected
                           ? "bg-[#1f1f22] border-[#d62b70] shadow-[0_0_25px_rgba(214,43,112,0.3)] -translate-y-1"
                           : "bg-[#16161a]/70 border-white/5 hover:bg-[#1f1f22]/70 hover:border-white/15 hover:-translate-y-0.5"
-                      }`}
+                        }`}
                     >
                       <div
                         className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 shadow-sm"
@@ -294,11 +302,10 @@ const Home = () => {
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
                 <button
                   onClick={() => setActiveGenre(null)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                    !activeGenre
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${!activeGenre
                       ? "bg-[#d62b70] text-white shadow-[0_0_15px_rgba(214,43,112,0.4)]"
                       : "bg-[#16161a] text-[#94a3b8] hover:text-white hover:bg-[#1f1f22] border border-white/5"
-                  }`}
+                    }`}
                 >
                   All Genres
                 </button>
@@ -309,11 +316,10 @@ const Home = () => {
                     <button
                       key={genre}
                       onClick={() => setActiveGenre(isSelected ? null : genre)}
-                      className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                        isSelected
+                      className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${isSelected
                           ? "bg-[#d62b70] text-white shadow-[0_0_15px_rgba(214,43,112,0.4)]"
                           : "bg-[#16161a] text-[#94a3b8] hover:text-white hover:bg-[#1f1f22] border border-white/5"
-                      }`}
+                        }`}
                     >
                       {genre}
                     </button>
@@ -452,7 +458,7 @@ const Home = () => {
 
           {/* RIGHT SIDEBAR (CONTEXTUAL PANELS) */}
           <aside className="flex flex-col gap-6 w-full sticky top-20">
-            
+
             {/* 1. Face Expression Scanner Card */}
             <div>
               <div className="flex items-center justify-between mb-2.5">
