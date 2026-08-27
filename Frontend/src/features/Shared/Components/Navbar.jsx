@@ -45,6 +45,10 @@ const Navbar = ({ onSearchChange, searchTerm = "" }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    setLocalSearch(searchTerm);
+  }, [searchTerm]);
+
   const handleLogout = async () => {
     setMenuOpen(false);
     const resultAction = await logout();

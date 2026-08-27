@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useOutletContext } from "react-router";
+import { filterSongs } from "../utils/filterSongs.js";
 import {
   LuPlay,
   LuPause,
@@ -43,6 +44,7 @@ const Home = () => {
 
   const [activeMood, setActiveMood] = useState(null);
   const [activeGenre, setActiveGenre] = useState(null);
+  const { searchTerm, clearSearch } = useOutletContext() || {};
 
   useEffect(() => {
     fetchSongs();
@@ -62,14 +64,10 @@ const Home = () => {
     return Array.from(set);
   }, [songs]);
 
-  // Filter songs by active mood and genre
+  // Filter songs by the active controls and global search term
   const filteredSongs = useMemo(() => {
-    return songs.filter((song) => {
-      if (activeMood && song.mood?.toLowerCase() !== activeMood.toLowerCase()) return false;
-      if (activeGenre && !song.genre?.includes(activeGenre)) return false;
-      return true;
-    });
-  }, [songs, activeMood, activeGenre]);
+    return filterSongs(songs, { mood: activeMood, genre: activeGenre, search: searchTerm });
+  }, [songs, activeMood, activeGenre, searchTerm]);
 
   // Top mood hits for slider
   const topMoodHits = useMemo(() => {
@@ -409,7 +407,7 @@ const Home = () => {
                 <div className="flex items-center gap-2">
                   <LuMusic className="text-[#8b5cf6]" size={18} />
                   <h2 className="text-lg md:text-xl font-bold font-['Montserrat'] text-white tracking-tight">
-                    {activeMood || activeGenre ? "Matching Songs" : "All Songs Library"}
+                    {searchTerm ? "Search Results" : activeMood || activeGenre ? "Matching Songs" : "All Songs Library"}
                   </h2>
                 </div>
                 <span className="text-xs text-[#94a3b8]">
@@ -420,12 +418,13 @@ const Home = () => {
               {filteredSongs.length === 0 ? (
                 <div className="py-12 text-center rounded-2xl bg-[#16161a]/40 border border-white/5">
                   <p className="text-sm font-medium text-[#94a3b8]">
-                    No songs found matching current mood or genre filters.
+                    No songs found for {searchTerm ? `"${searchTerm}"` : "the current filters"}.
                   </p>
                   <button
                     onClick={() => {
                       setActiveMood(null);
                       setActiveGenre(null);
+                      clearSearch?.();
                     }}
                     className="mt-3 px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors"
                   >
