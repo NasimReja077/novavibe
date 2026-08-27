@@ -2,16 +2,13 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-hot-toast";
 import {
-  LuUser,
   LuMail,
   LuMusic,
   LuLayers,
   LuHeart,
   LuClock,
   LuLogOut,
-  LuSparkles,
   LuShieldCheck,
-  LuIdCard
 } from "react-icons/lu";
 import { useAuth } from "../hook/useAuth.js";
 import { useSongs } from "../../songs/hook/useSongs.js";
@@ -78,12 +75,7 @@ const Profile = () => {
                   <LuMail size={14} className="text-[#2bd6d6]" />
                   <span>{user?.email || "user@novavibe.ai"}</span>
                 </span>
-                {user?.id && (
-                  <span className="flex items-center gap-1.5">
-                    <LuIdCard size={14} className="text-[#8b5cf6]" />
-                    <span className="font-mono text-[11px]">{user.id}</span>
-                  </span>
-                )}
+                
               </div>
 
               {/* Actions */}
