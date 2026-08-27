@@ -8,6 +8,8 @@ import {
   LuImage
 } from "react-icons/lu";
 import { useSongs } from "../../songs/hook/useSongs.js";
+import { GENRE_OPTIONS, LANGUAGE_OPTIONS } from "../../songs/constants/genres.js";
+import MultiSelectDropdown from "../../Shared/Components/MultiSelectDropdown.jsx";
 
 const MOOD_OPTIONS = ["happy", "sad", "neutral", "surprised"];
 
@@ -19,9 +21,9 @@ const UploadSong = () => {
     title: "",
     songArtist: "",
     mood: "happy",
-    genre: "Pop",
     songLanguage: "english",
   });
+  const [genres, setGenres] = useState([]);
 
   const [songFile, setSongFile] = useState(null);
   const [posterFile, setPosterFile] = useState(null);
@@ -55,6 +57,10 @@ const UploadSong = () => {
       toast.error("Please select an MP3 audio file");
       return;
     }
+    if (genres.length === 0) {
+      toast.error("Please select at least one genre");
+      return;
+    }
 
     const data = new FormData();
     data.append("title", formData.title);
@@ -65,12 +71,7 @@ const UploadSong = () => {
     if (posterFile) {
       data.append("poster", posterFile);
     }
-
-    const genresArray = formData.genre
-      .split(",")
-      .map((g) => g.trim())
-      .filter(Boolean);
-    genresArray.forEach((g) => data.append("genre", g));
+    genres.forEach((g) => data.append("genre", g));
 
     const res = await uploadSong(data);
     if (!res.error) {
@@ -84,11 +85,11 @@ const UploadSong = () => {
   return (
     <div className="min-h-screen bg-[#0f0f12] text-[#e4e1e6] pb-36">
       <div className="mx-auto max-w-3xl px-4 md:px-8 py-8">
-        
+
         {/* Back Link */}
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#94a3b8] hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-[#94a3b8] hover:text-white mb-6 transition-colors cursor-pointer"
         >
           <LuArrowLeft size={16} />
           <span>Back to Dashboard</span>
@@ -111,7 +112,7 @@ const UploadSong = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
-            
+
             {/* Title & Artist */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -155,7 +156,7 @@ const UploadSong = () => {
                   name="mood"
                   value={formData.mood}
                   onChange={handleChange}
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none capitalize"
+                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white cursor-pointer focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none capitalize"
                 >
                   {MOOD_OPTIONS.map((m) => (
                     <option key={m} value={m} className="bg-[#16161a] text-white">
@@ -169,31 +170,29 @@ const UploadSong = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
                   Song Language
                 </label>
-                <input
-                  type="text"
+                <select
                   name="songLanguage"
                   value={formData.songLanguage}
                   onChange={handleChange}
-                  placeholder="e.g. english, hindi, japanese"
-                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-[#94a3b8]/50 focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none transition-all"
-                />
+                  className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white cursor-pointer capitalize focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none"
+                >
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <option key={lang} value={lang} className="bg-[#16161a] text-white capitalize">
+                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            {/* Genre */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-2">
-                Genre(s) (comma-separated)
-              </label>
-              <input
-                type="text"
-                name="genre"
-                value={formData.genre}
-                onChange={handleChange}
-                placeholder="e.g. Pop, Soft, Indie, Acoustic"
-                className="w-full rounded-xl bg-[#1f1f22] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-[#94a3b8]/50 focus:border-[#d62b70] focus:ring-1 focus:ring-[#d62b70] outline-none transition-all"
-              />
-            </div>
+            {/* Genre multi-select */}
+            <MultiSelectDropdown
+              label="Genre(s) *"
+              options={GENRE_OPTIONS}
+              selected={genres}
+              onChange={setGenres}
+              placeholder="Select one or more genres"
+            />
 
             {/* Audio File Upload */}
             <div>
@@ -205,7 +204,7 @@ const UploadSong = () => {
                 accept="audio/*"
                 onChange={handleSongFileChange}
                 required
-                className="w-full rounded-xl bg-[#1f1f22] border border-dashed border-white/20 p-3 text-xs text-[#94a3b8] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#d62b70] file:text-white hover:file:brightness-110 cursor-pointer"
+                className="w-full rounded-xl bg-[#1f1f22] border border-dashed border-white/20 p-3 text-xs text-[#94a3b8] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#d62b70] file:text-white file:cursor-pointer hover:file:brightness-110 cursor-pointer"
               />
               {songFile && (
                 <p className="text-[11px] text-[#ffb1c4] mt-1.5 flex items-center gap-1">
@@ -259,14 +258,14 @@ const UploadSong = () => {
             <div className="pt-6 border-t border-white/10 flex items-center justify-end gap-3">
               <Link
                 to="/dashboard"
-                className="px-5 py-2.5 rounded-full border border-white/10 text-xs font-semibold text-[#94a3b8] hover:text-white hover:bg-white/5 transition-colors"
+                className="px-5 py-2.5 rounded-full border border-white/10 text-xs font-semibold text-[#94a3b8] hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={uploading}
-                className="px-8 py-3 rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] text-white text-xs md:text-sm font-bold shadow-[0_4px_25px_rgba(214,43,112,0.45)] hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
+                className="px-8 py-3 rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] text-white text-xs md:text-sm font-bold shadow-[0_4px_25px_rgba(214,43,112,0.45)] hover:brightness-110 active:scale-95 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {uploading ? "Uploading Audio Track..." : "Publish Track"}
               </button>
