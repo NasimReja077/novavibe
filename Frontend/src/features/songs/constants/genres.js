@@ -1,0 +1,42 @@
+export const GENRE_OPTIONS = [
+  "Pop",
+  "Lo-Fi",
+  "Rock",
+  "Hip-Hop",
+  "chillout",
+  "Neo-Soul",
+  "Classical",
+  "Folk",
+  "Indie",
+  "Electronic",
+  "Punk",
+  "K-pop",
+  "Heavy-Metal",
+  "J-pop",
+  "Bollywood",
+  "Country",
+  "Blues",
+  "Metal",
+  "Soundtrack",
+  "Disco",
+  "Soft",
+];
+
+
+export const LANGUAGE_OPTIONS = [
+  "english",
+  "hindi",
+  "punjabi",
+  "tamil",
+  "telugu",
+  "bengali",
+  "spanish",
+  "french",
+  "german",
+  "korean",
+  "japanese",
+  "chinese",
+  "portuguese",
+  "italian",
+  "Other"
+];
