@@ -58,6 +58,8 @@ const SongRow = ({
         <img
           src={song.posterUrl || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop"}
           alt={song.title}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
         />
         <button

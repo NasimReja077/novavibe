@@ -15,6 +15,8 @@ const SongCard = ({ song, rank, isActive, isPlaying, onPlay }) => {
         <img
           src={song.posterUrl || "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop"}
           alt={song.title}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
 
