@@ -5,6 +5,9 @@ import { usePlaylists } from "../hook/usePlaylist.js";
 import { usePlayer } from "../../player/hook/usePlayer.js";
 import { useAuth } from "../../auth/hook/useAuth.js";
 import Loading from "../../Shared/Components/Loading.jsx";
+import PageShell from "../../Shared/Components/PageShell.jsx";
+import PageHeader from "../../Shared/Components/PageHeader.jsx";
+import EmptyState from "../../Shared/Components/EmptyState.jsx";
 
 const Playlists = () => {
   const { playlists, loading, fetchPlaylists, deletePlaylist } = usePlaylists();
@@ -25,24 +28,8 @@ const Playlists = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f12] text-[#e4e1e6] pb-36">
-      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8">
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <LuLayers className="text-[#2bd6d6]" size={22} />
-              <h1 className="text-2xl md:text-3xl font-black font-['Montserrat'] text-white tracking-tight">
-                Playlists
-              </h1>
-            </div>
-            <p className="text-xs md:text-sm text-[#94a3b8]">
-              Curated collections of mood tracks for every vibe.
-            </p>
-          </div>
-
-          {isAuthenticated && (
+    <PageShell>
+      <PageHeader icon={LuLayers} accent="#2bd6d6" title="Playlists" description="Curated collections of mood tracks for every vibe." action={isAuthenticated && (
             <Link
               to="/create-playlist"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#d62b70] to-[#8b5cf6] text-white text-xs md:text-sm font-bold shadow-[0_4px_20px_rgba(214,43,112,0.4)] hover:brightness-110 transition-all hover:scale-105 active:scale-95"
@@ -50,27 +37,16 @@ const Playlists = () => {
               <LuPlus size={16} />
               <span>Create Playlist</span>
             </Link>
-          )}
-        </div>
+          )} />
 
         {/* Playlists Grid */}
         {playlists.length === 0 ? (
-          <div className="py-16 text-center rounded-3xl bg-[#16161a]/50 border border-white/5 p-8">
-            <LuLayers className="mx-auto text-[#94a3b8] mb-3" size={36} />
-            <h3 className="text-lg font-bold text-white">No Playlists Found</h3>
-            <p className="text-xs text-[#94a3b8] mt-1 max-w-sm mx-auto">
-              Create your first personalized playlist to group your favorite mood songs together!
-            </p>
-            {isAuthenticated && (
-              <Link
-                to="/create-playlist"
-                className="mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#d62b70] text-white text-xs font-bold"
-              >
-                <LuPlus size={14} />
-                <span>Create Playlist Now</span>
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            icon={LuLayers}
+            title="No Playlists Found"
+            description="Create your first personalized playlist to group your favorite mood songs together!"
+            action={isAuthenticated && <Link to="/create-playlist" className="inline-flex items-center gap-2 rounded-full bg-[#d62b70] px-5 py-2 text-xs font-bold text-white"><LuPlus size={14} /><span>Create Playlist Now</span></Link>}
+          />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {playlists.map((playlist) => (
@@ -128,8 +104,7 @@ const Playlists = () => {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </PageShell>
   );
 };
 
