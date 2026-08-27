@@ -108,8 +108,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f12] text-[#e4e1e6] pb-36">
-      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-6">
-
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
         {/* Main Grid: Left Fluid Content (9 cols) + Right Contextual Sidebar (3 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_340px] gap-8 items-start">
 
