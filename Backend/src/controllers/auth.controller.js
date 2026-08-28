@@ -8,17 +8,19 @@ async function sendTokenResponse(user, res, message) {
      const accessToken = generateAccessToken(user);
      const refreshToken = generateRefreshToken(user);
 
+     const isProduction = config.NODE_ENV === "production";
+
      res.cookie("accessToken", accessToken, {
           httpOnly: true,
-          secure: config.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "lax",
           maxAge: 24 * 60 * 60 * 1000 // 1 day
      })
 
      res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: config.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
      })
 
@@ -118,18 +120,19 @@ export const googleCallback = async (req, res) => {
      res.cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: config.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 1 * 24 * 60 * 1000
+          sameSite: config.NODE_ENV === "production" ? "None" : "lax",
+          maxAge: 24 * 60 * 60 * 1000
      })
 
      res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: config.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: config.NODE_ENV === "production" ? "None" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000
      })
 
-     res.redirect("http://localhost:5173/")
+     const frontendURL = process.env.FRONTEND_URL || "http://localhost:5173";
+     res.redirect(`${frontendURL}/`);
      } catch (error) {
           console.error("Google auth error:", error);
           res.redirect(config.NODE_ENV === "development" ? "http://localhost:5173/login" : "/login");
@@ -155,16 +158,18 @@ export const logout = async (req, res) => {
      const accessToken = req.cookies?.accessToken;
      const refreshToken = req.cookies?.refreshToken;
 
+     const isProduction = config.NODE_ENV === "production";
+
      res.clearCookie("accessToken", {
           httpOnly: true,
-          secure: config.NODE_ENV === "production",
-          sameSite: "lax"
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "lax"
      });
 
      res.clearCookie("refreshToken", {
           httpOnly: true,
-          secure: config.NODE_ENV === "production",
-          sameSite: "lax"
+          secure: isProduction,
+          sameSite: isProduction ? "None" : "lax"
      });
 
      if (!accessToken && !refreshToken) {
@@ -226,14 +231,14 @@ export const refresh = async (req, res) => {
           res.cookie("accessToken", newAccessToken, {
                httpOnly: true,
                secure: config.NODE_ENV === "production",
-               sameSite: "lax",
+               sameSite: config.NODE_ENV === "production" ? "None" : "lax",
                maxAge: 24 * 60 * 60 * 1000 // 1 day
           });
 
           res.cookie("refreshToken", newRefreshToken, {
                httpOnly: true,
                secure: config.NODE_ENV === "production",
-               sameSite: "lax",
+               sameSite: config.NODE_ENV === "production" ? "None" : "lax",
                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
           });
 
