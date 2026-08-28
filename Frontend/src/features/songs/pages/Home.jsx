@@ -34,6 +34,8 @@ const MOOD_META = [
   { key: "surprised", label: "Surprised", icon: LuSparkles, color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)", border: "rgba(245, 158, 11, 0.35)", desc: "Dynamic & bold" },
 ];
 
+const SONGS_PER_PAGE = 10;
+
 const Home = () => {
   const { songs, loading, fetchSongs } = useSongs();
   const { currentSong, isPlaying, playSong, togglePlay } = usePlayer();
@@ -44,6 +46,7 @@ const Home = () => {
 
   const [activeMood, setActiveMood] = useState(null);
   const [activeGenre, setActiveGenre] = useState(null);
+  const [songPage, setSongPage] = useState(1);
   const { searchTerm, clearSearch } = useOutletContext() || {};
 
   useEffect(() => {
@@ -68,6 +71,17 @@ const Home = () => {
   const filteredSongs = useMemo(() => {
     return filterSongs(songs, { mood: activeMood, genre: activeGenre, search: searchTerm });
   }, [songs, activeMood, activeGenre, searchTerm]);
+
+  const isAllSongsLibrary = !searchTerm && !activeMood && !activeGenre;
+  const displayedSongs = useMemo(() => {
+    return isAllSongsLibrary
+      ? filteredSongs.slice(0, songPage * SONGS_PER_PAGE)
+      : filteredSongs;
+  }, [filteredSongs, isAllSongsLibrary, songPage]);
+
+  useEffect(() => {
+    setSongPage(1);
+  }, [activeMood, activeGenre, searchTerm]);
 
   // Top mood hits for slider
   const topMoodHits = useMemo(() => {
@@ -389,7 +403,7 @@ const Home = () => {
                           alt={pl.title}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                         <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white">
                           {pl.songCount || pl.songs?.length || 0} Songs
                         </div>
@@ -416,7 +430,9 @@ const Home = () => {
                   </h2>
                 </div>
                 <span className="text-xs text-[#94a3b8]">
-                  {filteredSongs.length} available
+                  {isAllSongsLibrary && displayedSongs.length < filteredSongs.length
+                    ? `${displayedSongs.length} of ${filteredSongs.length}`
+                    : `${filteredSongs.length} available`}
                 </span>
               </div>
 
@@ -438,7 +454,7 @@ const Home = () => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {filteredSongs.map((song, idx) => (
+                  {displayedSongs.map((song, idx) => (
                     <SongRow
                       key={song._id}
                       song={song}
@@ -450,6 +466,15 @@ const Home = () => {
                       onToggleBookmark={isAuthenticated ? handleToggleBookmark : null}
                     />
                   ))}
+                  {isAllSongsLibrary && displayedSongs.length < filteredSongs.length && (
+                    <button
+                      type="button"
+                      onClick={() => setSongPage((page) => page + 1)}
+                      className="mt-3 self-center rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:border-[#d62b70]/50 hover:bg-[#d62b70]/15"
+                    >
+                      Load More Songs
+                    </button>
+                  )}
                 </div>
               )}
             </section>
