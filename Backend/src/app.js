@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
+import helmet from "helmet";
 
 import authRoutes from "./routes/auth.routes.js";
 import songRoutes from "./routes/song.routes.js";
@@ -13,8 +14,13 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { config } from "./config/config.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
+const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL].filter(Boolean);
+
+app.use(helmet());
 
 app.use(morgan("dev"));
 app.use(express.json());
@@ -22,11 +28,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors({
-     origin: "http://localhost:5173",
+     origin: allowedOrigins,
      methods: [ "GET", "POST", "PUT", "DELETE" ],
      credentials: true
-}))
+}));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(morgan("combined"));
+}
+
 
 /**
  * Routes
